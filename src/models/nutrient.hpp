@@ -4,15 +4,8 @@
 #include <string>
 #include<format>
 namespace cc::models{
-// Represents one nutrient 
-// protein , Carbs , Fat
-//
-/*enum class NUTRIENT_NAME{
-  Protein,
-  Carbs,
-  Fat
-}; // enum::NUTRIENT_NAME
-   */
+
+   
 class Nutrient{
  private:
     std::string name_; // Protein , Carbs , Fat
@@ -46,5 +39,3 @@ inline void from_json(const nlohmann::json &j,cc::models::Nutrient &n){
     n.setUnit(j.at("unit").get<std::string>());
 }
 } // namespace cc::models
-
-

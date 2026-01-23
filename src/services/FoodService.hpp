@@ -22,6 +22,8 @@ public:
   cc::utils::Result<void> addManualFood(const  cc::models::Food &food);
   cc::utils::Result<void> updateFood(const  cc::models::Food &food);
   cc::utils::Result<void> deleteFood(const std::string& id);
+  cc::utils::Result<void> clear_data_base();
+
   cc::utils::Result<std::vector<cc::models::Food>> listFoods(int offset = 0, int limit = 50);
 
   void setCacheTtlSeconds(int seconds);

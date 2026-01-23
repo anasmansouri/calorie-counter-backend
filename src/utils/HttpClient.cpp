@@ -31,7 +31,7 @@ namespace cc::utils
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1L);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
 
-    // 🔁 Follow redirects (e.g., http -> https, CDN hops)
+    // Follow redirects (e.g., http -> https, CDN hops)
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 10L); // cap redirect chain
 #if LIBCURL_VERSION_NUM >= 0x073800
@@ -52,6 +52,7 @@ namespace cc::utils
     }
 
     // perform
+    
     const CURLcode rc = curl_easy_perform(curl);
 
     long http_code = 0;

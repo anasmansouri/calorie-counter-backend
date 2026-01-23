@@ -8,7 +8,6 @@ namespace cc
     namespace services
     {
 
-        // TODO: implement your classes/functions here
         FoodService::FoodService(std::shared_ptr<cc::storage::FoodRepository> repo,
                                  std::shared_ptr<cc::clients::OpenFoodFactsClient> off) : repo_{repo}, off_{off}
 
@@ -28,13 +27,15 @@ namespace cc
                 f = this->off_->getByBarcode(bardcode);
                 if (f)
                 {
+                    // save food in data base so next time will be available no need to look online
+                    this->repo_->save(f.unwrap());
                     return f;
                 }
             }
             return cc::utils::Result<cc::models::Food>::fail(cc::utils::ErrorCode::NotFound, "Food not found");
         }
 
-        // zed der les cas , bach thkam l program
+        // #todo zed der les cas , bach thkam l program
         cc::utils::Result<void> FoodService::addManualFood(const cc::models::Food &food)
         {
             cc::utils::Result<void> result = this->repo_->save(food);
@@ -75,6 +76,20 @@ namespace cc
             }
         }
 
+        cc::utils::Result<void> FoodService::clear_data_base(){
+
+            cc::utils::Result<void> result = this->repo_->clear();
+            if (result)
+            {
+                return cc::utils::Result<void>::ok();
+            }
+            else
+            {
+                return cc::utils::Result<void>::fail(cc::utils::ErrorCode::StorageError, "can't clear data base");
+            }
+
+        }
+
         cc::utils::Result<std::vector<cc::models::Food>> FoodService::listFoods(int offset, int limit)
         {
             cc::utils::Result<std::vector<cc::models::Food>> result = this->repo_->list(offset, limit);
@@ -84,7 +99,7 @@ namespace cc
             }
             else
             {
-                return cc::utils::Result<std::vector<cc::models::Food>>::fail(cc::utils::ErrorCode::NotFound, "data base is empty , or can't access is forbiden ");
+                return cc::utils::Result<std::vector<cc::models::Food>>::fail(cc::utils::ErrorCode::NotFound, "can't access, or access is forbiden ");
             }
         }
     } // namespace services

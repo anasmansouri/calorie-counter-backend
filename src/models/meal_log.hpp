@@ -1,24 +1,22 @@
 #pragma once
-#include "models/food.hpp"
 #include <chrono>
-#include <iostream>
 #include <string>
 #include <vector>
 #include <utility>
-#include <cstdint>
 #include <nlohmann/json.hpp>
 #include "utils/date_time_utils.hpp"
-
+#include <magic_enum.hpp>
 namespace cc::models
 {
 
-  enum class MEALNAME : uint8_t
+  enum class MEALNAME 
   {
     Breakfast,
     Lunch,
     Dinner,
     Snack
   }; // enum::MEALNAME
+     
   class MealLog
   {
   private:
@@ -26,13 +24,11 @@ namespace cc::models
     std::string id_;
     MEALNAME name_{MEALNAME::Lunch};
     std::vector<std::pair<std::string, double>> food_items_; // foodId, grams
-    double totalKcal_{0};
 
   public:
 
     // constructors
     MealLog() = default;
-    // MealLog(MEALNAME mealName,std::vector<std::pair<std::string,double>> food_items);
     MealLog(MEALNAME mealName);
 
     // setters
@@ -40,15 +36,11 @@ namespace cc::models
     void setId(std::string id);
     void setTime(std::chrono::system_clock::time_point tsUtc);
     void setFoodItems(std::vector<std::pair<std::string, double>> food_items);
-    // void setTotalKcal(double kcal){
-    // this->totalKcal_=kcal;
-    // }
     
     // getters
     MEALNAME getName() const;
     std::string id() const;
     std::chrono::system_clock::time_point gettime() const;
-    double totalKcal() const;
     std::vector<std::pair<std::string, double>> food_items() const;
     // operations
     void addFoodItem(const std::string &foodId, double grams);
@@ -57,7 +49,7 @@ namespace cc::models
   inline void to_json(nlohmann::json &j, const cc::models::MealLog &m)
   {
     j = {
-        {"name", m.getName()},
+        {"name", magic_enum::enum_name(m.getName())},
         {"id", m.id()},
         {
             "foodItems",
@@ -65,12 +57,17 @@ namespace cc::models
         },
         {"tsUtc", cc::utils::toIso8601(m.gettime())}};
   }
+  // mrowena had l function 
   inline void from_json(const nlohmann::json &j, cc::models::MealLog &m)
   {
-    m.setId(m.id());
-    m.setTime(m.gettime());
-    m.setName(j.at("name").get<MEALNAME>());
-    // m.setTotalKcal(j.at("totalKcal").get<double>());
+    auto meal_name = magic_enum::enum_cast<MEALNAME>(j.at("name").get<std::string>());
+    if(meal_name){
+        m.setName(meal_name.value());
+    }else{
+        m.setName(MEALNAME::Breakfast);
+    }
+    m.setId(j.at("id").get<std::string>());
+    m.setTime(cc::utils::fromIso8601(j.at("tsUtc").get<std::string>()));
     m.setFoodItems(j.at("foodItems").get<std::vector<std::pair<std::string, double>>>());
   }
 } // namespace cc::models

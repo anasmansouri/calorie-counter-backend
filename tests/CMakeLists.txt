@@ -13,7 +13,15 @@ FetchContent_MakeAvailable(googletest)
 find_package(Threads REQUIRED)
 
 #add_executable(cc_test_models test_models.cpp test_JsonMealRepository.cpp)
-add_executable(cc_test_models  test_models.cpp test_JsonMealRepository.cpp)
+add_executable(cc_test_models
+    test_models/test_meal_model.cpp
+    test_models/test_nutrient.cpp
+    test_models/test_daily_log.cpp
+    test_models/test_food.cpp
+    test_clients/test_OpenFoodFactsClient.cpp
+    test_storage/test_JsonFoodRepository.cpp
+    test_service/test_food_service.cpp
+    )
 
 target_link_libraries(cc_test_models PRIVATE
   cc_utils
@@ -21,7 +29,7 @@ target_link_libraries(cc_test_models PRIVATE
   cc_clients
   cc_storage
   cc_services
-  cc_api
+  #cc_api
   GTest::gtest_main
   Threads::Threads
 )

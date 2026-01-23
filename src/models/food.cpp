@@ -17,8 +17,8 @@ Food::Food(std::string id_, std::string name_, double caloriesPer100g_,
     : id_{id_}, name_{name_}, caloriesPer100g_{caloriesPer100g_},
       nutrients_{nutrient_}, servingSizeG_{servingSizeG_}, barcode_{barcode_},
       brand_{brand_}, imageUrl_{imageUrl_} {
-        this->servingSizeG_=0;
-  std::cout << "Food Created" << std::endl;
+          //#todo double check this comment , kaybanli masaleh lwalo
+        // this->servingSizeG_=0; // mchkok fhadi 3lach servingSizeG intialiazed by 0
 }
 
 std::string Food::to_string()const {
@@ -61,11 +61,6 @@ void Food::setCaloriesPer100g(double kcal){
     this->caloriesPer100g_=kcal;
 }
 
- // TotalKcal
-  double Food::totalKcal() const {
-      return this->totalKcal_;
-  }
-
 const std::optional<double>& Food::servingSizeG()const{
     return this->servingSizeG_;
 }
@@ -93,19 +88,16 @@ void Food::setImageUrl(std::optional<std::string> url){
 }
 
 //source 
-const std::string& Food::source()const{
+const SOURCE& Food::source()const{
     return this->source_;
 }
-void Food::setSource(std::string s){
+void Food::setSource(SOURCE s){
     this->source_=s;
 }
 
 // totalKcal
-void Food::update_totalKcal(){
-      this->totalKcal_=(this->servingSizeG_.value())*(this->caloriesPer100g_);
+double Food::totalKcal() const {
+      return (this->servingSizeG_.value())*(this->caloriesPer100g_);
 }
-
-
-
 } // namespace models
 } // namespace cc

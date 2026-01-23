@@ -33,7 +33,7 @@ TEST_F(JsonMealRepositoryTest,initializition) {
     minina.setBarcode(std::string("2131654967498"));
     minina.setCaloriesPer100g(420.0);
     minina.setServingSizeG(40.0); // default serving size 40g
-    minina.setSource("manual");
+    minina.setSource(cc::models::SOURCE::Manual);
     minina.setImageUrl(std::string("https://example.com/granola.jpg"));
 
     cc::models::MealLog breakfast(cc::models::MEALNAME::Breakfast);
@@ -50,7 +50,7 @@ TEST_F(JsonMealRepositoryTest,getById) {
     minina.setBarcode(std::string("2131654967498"));
     minina.setCaloriesPer100g(420.0);
     minina.setServingSizeG(40.0); // default serving size 40g
-    minina.setSource("manual");
+    minina.setSource(cc::models::SOURCE::Manual);
     minina.setImageUrl(std::string("https://example.com/granola.jpg"));
 
     cc::models::MealLog breakfast(cc::models::MEALNAME::Breakfast);

@@ -24,15 +24,6 @@ namespace cc::models
         this->name_ = name;
     }
 
-    double MealLog::totalKcal() const
-    {
-        double sum{0};
-        for (auto it = this->food_items_.begin(); it != this->food_items_.end(); ++it)
-        {
-            // sum+=it->second.totalKcal;
-        }
-        return sum;
-    }
     std::string MealLog::id() const
     {
         return this->id_;

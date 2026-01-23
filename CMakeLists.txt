@@ -18,7 +18,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Compiler warnings (good for dev)
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    add_compile_options(-Wall -Wextra -Wpedantic)
+    add_compile_options(-Wall -Wextra -Wpedantic -ftemplate-backtrace-limit=0 -fdiagnostics-color=always)
 endif()
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -29,11 +29,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 # Option to build tests
 option(BUILD_TESTS "Build unit and integration tests" OFF)
 
-# External dependencies (examples)
-# You can use find_package or FetchContent here
-# find_package(crow CONFIG REQUIRED)
-# find_package(nlohmann_json CONFIG REQUIRED)
-# find_package(SQLite3 REQUIRED)
 
 # put executables in build/bin and libs in build/lib
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -45,8 +40,7 @@ add_subdirectory(src)
 # Only enable tests when requested
 if (BUILD_TESTS)
   include(CTest)
+  set(CMAKE_CTEST_ARGUMENTS "--output-on-failure;--verbose")
   enable_testing()
   add_subdirectory(tests)
 endif()
-
-

@@ -133,7 +133,7 @@ int main()
     /// ##############################
     ///
 
-    // perly
+    // Barilla 
     std::string barcode{"8076809543934"};
     // 6111242100985
     // std::string barcode{"8076809543934"};
@@ -234,7 +234,7 @@ int main()
     f.setBarcode(std::string("7622210449283"));
     f.setCaloriesPer100g(420.0);
     f.setServingSizeG(40.0); // default serving size 40g
-    f.setSource("manual");
+    f.setSource(cc::models::SOURCE::Manual);
     f.setImageUrl(std::string("https://example.com/granola.jpg"));
     cc::utils::Result<void> r_update_insert = jsonFoodRepository.upsert(f);
 
@@ -257,7 +257,7 @@ int main()
     new_food.setBarcode(std::string("2131654967498"));
     new_food.setCaloriesPer100g(420.0);
     new_food.setServingSizeG(40.0); // default serving size 40g
-    new_food.setSource("manual");
+    new_food.setSource(cc::models::SOURCE::Manual);
     new_food.setImageUrl(std::string("https://example.com/granola.jpg"));
     f_service.addManualFood(new_food);
 
@@ -300,7 +300,7 @@ int main()
     minina.setBarcode(std::string("2131654967498"));
     minina.setCaloriesPer100g(420.0);
     minina.setServingSizeG(40.0); // default serving size 40g
-    minina.setSource("manual");
+    minina.setSource(cc::models::SOURCE::Manual);
     minina.setImageUrl(std::string("https://example.com/granola.jpg"));
     new_meal.addFoodItem(new_food.id(),100);
     

@@ -32,14 +32,4 @@ namespace cc::utils
         auto t = timegm(&tm); // POSIX: convert UTC struct tm → time_t
         return std::chrono::system_clock::from_time_t(t);
     }
-
-    // // JSON integration
-    // inline void to_json(nlohmann::json& j, const TimePoint& tp) {
-    // j = toIso8601(tp);
-    // }
-
-    // inline void from_json(const nlohmann::json& j, TimePoint& tp) {
-    // tp = fromIso8601(j.get<std::string>());
-    // }
-
 } // namespace cc::utils

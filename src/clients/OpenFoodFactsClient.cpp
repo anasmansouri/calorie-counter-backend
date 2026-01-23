@@ -2,192 +2,28 @@
 #include "models/nutrient.hpp"
 #include "utils/Result.hpp"
 #include <array>
+#include <exception>
 #include <nlohmann/json.hpp>
 #include <algorithm>
 #include <clients/OpenFoodFactsClient.hpp>
 #include <curl/curl.h>
 #include <iostream>
-#include <string>
 #include <utility>
 #include <utils/HttpClient.hpp>
+#include <utils/common_functions.hpp>
 #include <vector>
 namespace cc::clients
 {
     OpenFoodFactsClient::OpenFoodFactsClient(const std::string baseUrl, const std::string userAgent) : baseUrl_(baseUrl), userAgent_(userAgent)
     {
+        this->locale="en";
     }
-
-    cc::utils::Result<cc::models::Food> OpenFoodFactsClient::parseFoodFromOffJson_barcode(cc::utils::Result<std::string> food_in_off_json_format)
+    cc::utils::Result<cc::models::Food> OpenFoodFactsClient::getByBarcode(const std::string &barcode)
     {
-        //  product
-        nlohmann::json j = nlohmann::json::parse(food_in_off_json_format.unwrap());
-        auto product = j.at("product");
-        cc::models::Food food_item;
-        if (product.contains("brands") && !product["brands"].is_null())
-        {
-            food_item.setName(product.at("brands").get<std::string>());
-            food_item.setBrand(product.at("brands").get<std::string>());
-            // food_item.setBrand("anas");
+        
+        if(!(cc::utils::isBarCodeDigit(barcode))){
+            return cc::utils::Result<cc::models::Food>::fail(cc::utils::ErrorCode::InvalidInput,"barcode needs to be a number");
         }
-        else
-        {
-            food_item.setName("null");
-            food_item.setBrand("null");
-        }
-
-        if (product.contains("selected_images") && !product["selected_images"].is_null())
-        {
-                food_item.setImageUrl(product.at("selected_images").at("front").at("display").at("fr").get<std::string>());
-        } // no need for else already null by default
-
-        // Check if the key "person" exists and is an object
-        // Loop through all key-value pairs under "person"
-        for (auto it = product.begin(); it != product.end(); ++it)
-        {
-            std::cout << " - " << it.key() << std::endl;
-        }
-        // }
-        if (product.contains("code") && !product["code"].is_null())
-        {
-            food_item.setBarcode(product.at("code").get<std::string>());
-            food_item.setId(product.at("code").get<std::string>());
-        } // no need for else already null by default
-
-        //  nutriments
-
-        if (product.contains("nutriments") && !product["nutriments"].is_null())
-        {
-            auto nutriments = product.at("nutriments");
-            std::vector<cc::models::Nutrient> ns;
-
-            // calories
-            if (nutriments.contains("energy-kcal_100g") && !nutriments["energy-kcal_100g"].is_null())
-            {
-                std::cout << "we did set calories" << std::endl;
-                food_item.setCaloriesPer100g(nutriments.at("energy-kcal_100g").get<double>());
-            }
-            else
-            {
-                std::cout << "no calories are found " + nutriments.at("energy-kcal_100g").get<std::string>() << std::endl;
-            } // no need for else already null by default
-
-            // protein
-
-            if (nutriments.contains("proteins") && !nutriments["proteins"].is_null())
-            {
-                models::Nutrient p;
-                p.setName("protein");
-                p.setUnit(nutriments.at("proteins_unit").get<std::string>());
-                p.setValue(nutriments.at("proteins").get<double>());
-                ns.push_back(p);
-            }
-
-            // carbs
-            if (nutriments.contains("carbohydrates") && !nutriments["carbohydrates"].is_null())
-            {
-                models::Nutrient carbs;
-                carbs.setName("carbohydrates");
-                carbs.setUnit(nutriments.at("carbohydrates_unit"));
-                carbs.setValue(nutriments.at("carbohydrates"));
-                ns.push_back(carbs);
-            }
-
-            //  fat
-            if (nutriments.contains("fat") && !nutriments["fat"].is_null())
-            {
-                models::Nutrient fat;
-                fat.setName("fat");
-                fat.setUnit(nutriments.at("fat_unit"));
-                fat.setValue(nutriments.at("fat"));
-                ns.push_back(fat);
-            }
-
-            food_item.setNutrients(ns);
-        }
-        return cc::utils::Result<cc::models::Food>::ok(std::move(food_item));
-    }
-
-    // cc::utils::Result<std::vector<cc::models::Food>> OpenFoodFactsClient::parseFoodFromOffJson(cc::utils::Result<std::string> food_in_off_json_format, std::string searched_item)
-    // {
-    // nlohmann::json j = nlohmann::json::parse(food_in_off_json_format.unwrap());
-    // auto products = j.value("products", nlohmann::json::array());
-    // const int max_number_of_products = 4;
-    // std::vector<cc::models::Food> food_items;
-    // for (size_t i = 0; i < products.size() && i < max_number_of_products; i++)
-    // {
-    // auto nutriments = products[i].at("nutriments");
-    // // protein
-    // cc::models::Food f;
-    // f.setName(searched_item + std::to_string(i));
-    // std::vector<cc::models::Nutrient> ns;
-    // // protein
-    // models::Nutrient p;
-    // p.setName("protein");
-    // p.setUnit(nutriments.at("proteins_unit").get<std::string>());
-    // p.setValue(nutriments.at("proteins").get<double>());
-    // std::cout << p.to_string() << std::endl;
-    // ns.push_back(p);
-    // // carbs
-    // models::Nutrient carbs;
-    // carbs.setName("carbohydrates");
-    // carbs.setUnit(nutriments.at("carbohydrates_unit"));
-    // carbs.setValue(nutriments.at("carbohydrates"));
-    // ns.push_back(carbs);
-    // //  fat
-    // models::Nutrient fat;
-    // fat.setName("fat");
-    // fat.setUnit(nutriments.at("fat_unit"));
-    // fat.setValue(nutriments.at("fat"));
-    // ns.push_back(fat);
-    // f.setNutrients(ns);
-    // food_items.push_back(f);
-    // }
-    // return cc::utils::Result<std::vector<cc::models::Food>>::ok(std::move(food_items));
-    // }
-    // cc::utils::Result<std::vector<cc::models::Food>> OpenFoodFactsClient::searchByName(const std::string &query, int page /*= 1*/, int pageSize /*= 10*/, const std::string &locale /*= "en"*/)
-    // {
-    // if (curl_global_init(CURL_GLOBAL_DEFAULT) != 0)
-    // {
-    // std::cerr << "curl_global_init failed\n";
-    // // chouf chno t returni hna
-    // }
-    // cc::utils::HttpClient http;
-    // http.setTimeoutMs(5000);
-    // http.setUserAgents(this->userAgent_);
-
-    // this->updateLanguageCountry(locale); // from world to the choosen language or country
-
-    // // it is mentioned there de "lc=de" for deutchland
-    // std::string reduce_payload = "  &tagtype_0=countries&tag_contains_0=contains&tag_0=en:germany \\
-    // &nutrition_data=on\\
-    // &lc=de\\
-    // &page_size=20\\
-    // &fields=code,product_name,brands,quantity,serving_size,nutrition_data_per,nutriments,nutriscore_grade,countries_tags,lc,categories_tags,selected_images,last_modified_t";
-    // auto r = http.getJson(this->baseUrl_ + "/cgi/search.pl?search_terms=" + query + "&search_simple=1&action=process&json=1");
-    // if (!r)
-    // {
-    // std::cerr << "GET failed: " << r.unwrap_error().message << "\n";
-    // return cc::utils::Result<std::vector<cc::models::Food>>::fail(cc::utils::ErrorCode::NetworkError, r.unwrap_error().message);
-    // }
-    // else
-    // {
-    // std::cout << "GET succeeded, body size = " << r.unwrap().size() << "\n";
-    // auto r_list_of_foods_parse = this->parseFoodFromOffJson(r, query);
-    // if (!r_list_of_foods_parse)
-    // {
-    // std::cerr << "parsing failed" << std::endl;
-    // return cc::utils::Result<std::vector<cc::models::Food>>::fail(cc::utils::ErrorCode::ParseError, r_list_of_foods_parse.unwrap_error().message);
-    // }
-    // else
-    // {
-    // std::cout << "parsed succeeded" << std::endl;
-    // return r_list_of_foods_parse;
-    // }
-    // }
-    // }
-
-    cc::utils::Result<cc::models::Food> OpenFoodFactsClient::getByBarcode(const std::string &barcode, const std::string &locale)
-    {
         if (curl_global_init(CURL_GLOBAL_DEFAULT) != 0)
         {
             std::cerr << "curl_global_init failed\n";
@@ -196,17 +32,15 @@ namespace cc::clients
         http.setTimeoutMs(5000);
         http.setUserAgents(this->userAgent_);
         // GET https://world.openfoodfacts.org/api/v0/product/{barcode}.json
-        this->updateLanguageCountry(locale);
         // it is mentioned there de "lc=de" for deutchland
-        std::string reduce_payload = "?lc=" + locale + "&fields=code,product_name,brands,quantity,serving_size,nutrition_data_per,nutriments,nutriscore_grade,countries_tags,lc,categories_tags,selected_images,last_modified_t";
-        auto r = http.getJson(this->baseUrl_ + "/api/v2/product/{" + barcode + "}.json" + reduce_payload);
+        std::string reduce_payload = "?lc=" + this->locale + "&fields=code,product_name,brands,quantity,serving_size,nutrition_data_per,nutriments,nutriscore_grade,countries_tags,lc,categories_tags,selected_images,last_modified_t";
+         // decltype(http.getJson(std::string{})) r;
+         auto r = http.getJson(this->baseUrl_ + "/api/v2/product/{" + barcode + "}.json" + reduce_payload);
         if (!r)
         {
             std::cerr << "GET failed: " << r.unwrap_error().message << "\n";
             return cc::utils::Result<cc::models::Food>::fail(cc::utils::ErrorCode::NetworkError, r.unwrap_error().message);
-        }
-        else
-        {
+        }else{
             std::cout << "GET succeeded, body size = " << r.unwrap().size() << "\n";
             auto parsed_food = this->parseFoodFromOffJson_barcode(r);
             if (!parsed_food)
@@ -229,6 +63,120 @@ namespace cc::clients
     }
     void OpenFoodFactsClient::updateLanguageCountry(const std::string &locale)
     {
+        this->locale=locale;
         this->baseUrl_ = "https://" + locale + ".openfoodfacts.org";
+    }
+
+    cc::utils::Result<cc::models::Food> OpenFoodFactsClient::parseFoodFromOffJson_barcode(cc::utils::Result<std::string> food_in_off_json_format)
+    {
+        //  product
+        nlohmann::json j = nlohmann::json::parse(food_in_off_json_format.unwrap());
+        if (j.contains("product"))
+        {
+
+            auto product = j.at("product");
+            cc::models::Food food_item;
+            if (product.contains("brands") && !product["brands"].is_null())
+            {
+                food_item.setName(product.at("product_name").get<std::string>());
+                food_item.setBrand(product.at("brands").get<std::string>());
+            }
+            else
+            {
+                food_item.setName("null");
+                food_item.setBrand("null");
+            }
+
+            if (product.contains("selected_images") && !product["selected_images"].is_null())
+            {
+                if (product.at("selected_images").contains("front") && !product.at("selected_images")["front"].is_null())
+                {
+
+                    if (product.at("selected_images")["front"].contains("display") && !product.at("selected_images")["front"]["display"].is_null())
+                    {
+
+                        if (product.at("selected_images")["front"]["display"].contains(this->locale) && !product.at("selected_images")["front"]["display"][this->locale].is_null())
+                        {
+                            food_item.setImageUrl(product.at("selected_images").at("front").at("display").at(this->locale).get<std::string>());
+                        }
+                        else if(product.at("selected_images")["front"]["display"].contains("de") && !product.at("selected_images")["front"]["display"]["de"].is_null())
+                        {
+                            food_item.setImageUrl(product.at("selected_images").at("front").at("display").at("de").get<std::string>());
+                        }
+                        else if (product.at("selected_images")["front"]["display"].contains("en") && !product.at("selected_images")["front"]["display"]["en"].is_null())
+                        {
+
+                            food_item.setImageUrl(product.at("selected_images").at("front").at("display").at("en").get<std::string>());
+                        }
+                        else if (product.at("selected_images")["front"]["display"].contains("fr") && !product.at("selected_images")["front"]["display"]["fr"].is_null())
+                        {
+                            food_item.setImageUrl(product.at("selected_images").at("front").at("display").at("fr").get<std::string>());
+                        }
+                    }
+                }
+            } // no need for else already null by default
+
+            // #todo remove this loop maybe
+            for (auto it = product.begin(); it != product.end(); ++it)
+            {
+                std::cout << " - " << it.key() << std::endl;
+            }
+            // }
+            if (product.contains("code") && !product["code"].is_null())
+            {
+                food_item.setBarcode(product.at("code").get<std::string>());
+                food_item.setId(product.at("code").get<std::string>());
+            } // no need for else already null by default
+
+            //  nutriments
+
+            if (product.contains("nutriments") && !product["nutriments"].is_null())
+            {
+                auto nutriments = product.at("nutriments");
+                std::vector<cc::models::Nutrient> ns;
+
+                // calories
+                if (nutriments.contains("energy-kcal_100g") && !nutriments["energy-kcal_100g"].is_null())
+                {
+                    food_item.setCaloriesPer100g(nutriments.at("energy-kcal_100g").get<double>());
+                }
+
+                // protein
+
+                if (nutriments.contains("proteins") && !nutriments["proteins"].is_null())
+                {
+                    models::Nutrient p;
+                    p.setName("protein");
+                    p.setUnit(nutriments.at("proteins_unit").get<std::string>());
+                    p.setValue(nutriments.at("proteins_100g").get<double>());
+                    ns.push_back(p);
+                }
+
+                // carbs
+                if (nutriments.contains("carbohydrates") && !nutriments["carbohydrates"].is_null())
+                {
+                    models::Nutrient carbs;
+                    carbs.setName("carbohydrates");
+                    carbs.setUnit(nutriments.at("carbohydrates_unit"));
+                    carbs.setValue(nutriments.at("carbohydrates_100g"));
+                    ns.push_back(carbs);
+                }
+
+                //  fat
+                if (nutriments.contains("fat") && !nutriments["fat"].is_null())
+                {
+                    models::Nutrient fat;
+                    fat.setName("fat");
+                    fat.setUnit(nutriments.at("fat_unit"));
+                    fat.setValue(nutriments.at("fat_100g"));
+                    ns.push_back(fat);
+                }
+
+                food_item.setNutrients(ns);
+            }
+            return cc::utils::Result<cc::models::Food>::ok(std::move(food_item));
+        }else{
+            return cc::utils::Result<cc::models::Food>::fail(cc::utils::ErrorCode::NotFound, "Product not found");
+        }
     }
 } // namespace cc::clients

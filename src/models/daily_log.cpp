@@ -8,14 +8,10 @@ namespace cc::models
 {
 
   DailyLog::DailyLog(std::chrono::system_clock::time_point tsUtc) : tsUtc_{tsUtc} {}
-  void DailyLog::addMeal(const MealLog &meal) { this->meals_.push_back(meal); }
-  double DailyLog::totalKcal() const
-  {
-    double sum_of_calories{0};
-    // std::ranges::for_each(this->meals_, [&sum_of_calories](auto &meal)
-                          // { sum_of_calories += meal.totalKcal(); });
-    return sum_of_calories;
+  void DailyLog::setDate(std::chrono::system_clock::time_point tsUtc){
+      this->tsUtc_ = tsUtc;
   }
+  void DailyLog::addMeal(const MealLog &meal) { this->meals_.push_back(meal); }
 
   void DailyLog::addMeals(const std::vector<MealLog> meals)
   {
@@ -23,4 +19,8 @@ namespace cc::models
   }
 
   std::vector<MealLog> DailyLog::meals() const { return this->meals_; }
+  std::chrono::system_clock::time_point DailyLog::getDate() const {
+      return this->tsUtc_;
+  }
+
 } // namespace cc::models

@@ -60,6 +60,7 @@ namespace cc::storage
 
   cc::utils::Result<std::vector<cc::models::Food>> JsonFoodRepository::list(int offset, int limit)
   {
+    std::lock_guard<std::mutex> lock(this->mtx_);
     std::ifstream infile(this->filePath_);
     nlohmann::json file_content;
     if (infile.is_open() && infile.peek() != std::ifstream::traits_type::eof())

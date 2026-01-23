@@ -2,6 +2,7 @@
 #include <vector>
 #include "meal_log.hpp"
 #include <nlohmann/json.hpp>
+#include <chrono>
 
 namespace cc::models
 {
@@ -10,12 +11,13 @@ namespace cc::models
   {
   public:
     DailyLog(std::chrono::system_clock::time_point tsUtc);
+
+    void setDate(std::chrono::system_clock::time_point tsUtc);
     void addMeal(const MealLog &meal);
     void addMeals(const std::vector<MealLog> meals);
-    void setTotalKcal(double kcal);
     // getters
     std::vector<MealLog> meals() const;
-    double totalKcal() const;
+    std::chrono::system_clock::time_point getDate() const;
 
   private:
     std::chrono::system_clock::time_point tsUtc_;

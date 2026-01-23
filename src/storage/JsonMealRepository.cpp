@@ -37,7 +37,6 @@ namespace cc::storage
 
   cc::utils::Result<cc::models::MealLog> JsonMealRepository::getById(const std::string &id)
   {
-
     std::lock_guard<std::mutex> lock(this->mtx_);
     std::ifstream infile(this->filePath_);
     nlohmann::json file_content;
@@ -49,9 +48,12 @@ namespace cc::storage
       {
         if (i["id"].get<std::string>() == id)
         {
-          cc::models::MealLog meal; 
-          meal.setId(i["id"].get<std::string>());
-          meal.setName(i["name"].get<cc::models::MEALNAME>());
+          cc::models::MealLog meal(i); 
+          // i can do it otherwise because of the parse between json to meal  object.
+          // return cc::utils::Result<cc::models::MealLog>::ok(cc::models::MealLog(i));
+          //meal.setId(i["id"].get<std::string>());
+          //meal.setName(i["name"].get<cc::models::MEALNAME>());
+          //meal = i;
           return cc::utils::Result<cc::models::MealLog>::ok(meal);
         }
       }
@@ -65,6 +67,7 @@ namespace cc::storage
 
   cc::utils::Result<std::vector<cc::models::MealLog>> JsonMealRepository::list(int offset, int limit)
   {
+    std::lock_guard<std::mutex> lock(this->mtx_);
     std::ifstream infile(this->filePath_);
     nlohmann::json file_content;
     if (infile.is_open() && infile.peek() != std::ifstream::traits_type::eof())

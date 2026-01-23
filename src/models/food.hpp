@@ -1,13 +1,20 @@
 #pragma once
+#include <cstdint>
 #include <string>
 #include <optional>
 #include <vector>
 #include <chrono>
+
+#include <magic_enum.hpp>
 #include "models/nutrient.hpp"
 #include <nlohmann/json.hpp>
 namespace cc::models
 {
-
+    enum  class SOURCE:uint8_t
+    {
+        Manual,
+        Online
+    };
     // Represents a single food item
     class Food
     {
@@ -22,7 +29,6 @@ namespace cc::models
              std::optional<std::string> brand_,
              std::optional<std::string> imageUrl_);
 
-        std::string to_string() const;
         // IDs & identity
         const std::string &id() const;
         void setId(std::string id);
@@ -40,7 +46,7 @@ namespace cc::models
         double caloriesPer100g() const;
         void setCaloriesPer100g(double kcal);
 
-        double totalKcal() const; // it is a getter and not const while i need to calculate totalKcal before i give it back
+        double totalKcal() const ; // it is a getter and not const while i need to calculate totalKcal before i give it back
                                   // no need to implement setter
 
         const std::optional<double> &servingSizeG() const;
@@ -54,11 +60,11 @@ namespace cc::models
         const std::optional<std::string> &imageUrl() const;
         void setImageUrl(std::optional<std::string> url);
 
-        const std::string &source() const; // "off" | "manual" | ...
-        void setSource(std::string s);
+        const SOURCE &source() const; // "off" | "manual" | ...
+        void setSource(SOURCE s);
 
-        // update totalKcal
-        void update_totalKcal();
+        std::string to_string()const; 
+
 
     private:
         std::string id_;
@@ -70,7 +76,7 @@ namespace cc::models
         std::optional<std::string> barcode_;
         std::optional<std::string> brand_;
         std::optional<std::string> imageUrl_{"img_url_empty"};
-        std::string source_{"manual"};
+        SOURCE source_{SOURCE::Online};
     }; // Food
     inline void to_json(nlohmann::json &j, const cc::models::Food &f)
     {
@@ -85,16 +91,13 @@ namespace cc::models
         j = {
             {"id", f.id()},
             {"name", f.name()},
-            // {"totalKcal",f.totalKcal()},
             {"nutrient", nutrient_array},
             {"caloriesPer100g", f.caloriesPer100g()},
             {"servingSizeG", f.servingSizeG()},
             {"barcode", f.barcode()},
             {"brand", f.brand()},
             {"imageUrl", f.imageUrl()},
-            {"source", f.source()}};
-
-        // j["nutrient"] = nutrient_array;
+            {"source", magic_enum::enum_name(f.source())}};
     }
 
     inline void from_json(const nlohmann::json &j, cc::models::Food &f)
@@ -104,10 +107,12 @@ namespace cc::models
         f.setCaloriesPer100g(j.at("caloriesPer100g").get<double>());
         // nutrient :
         std::vector<cc::models::Nutrient> vector_of_nutrients;
-        for (nlohmann::json i : j["nutrient"])
-        {
-            Nutrient n = i;
-            vector_of_nutrients.push_back(n);
+        if(j.contains("nutrient") && !j.at("nutrient").is_null()){
+            for (nlohmann::json i : j["nutrient"])
+            {
+                 Nutrient n = i;
+                 vector_of_nutrients.push_back(n);
+            }
         }
         f.setNutrients(vector_of_nutrients);
         if (j.contains("servingSizeG") && !j.at("servingSizeG").is_null())
@@ -119,7 +124,12 @@ namespace cc::models
         f.setBarcode(j.at("barcode").get<std::optional<std::string>>().value());
         f.setBrand(j.at("brand").get<std::optional<std::string>>().value());
         f.setImageUrl(j.at("imageUrl").get<std::string>());
-        f.setSource(j.at("source").get<std::string>());
+        auto source_value = magic_enum::enum_cast<SOURCE>(j.at("source").get<std::string>());
+        if(source_value){
+            f.setSource(source_value.value());
+        }else{
+            f.setSource(SOURCE::Online);
+        }
     }
 
 } // namespace cc::models
