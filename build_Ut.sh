@@ -4,7 +4,10 @@ cd build
 #rm -r *
 #cmake .. 
 #make 
-cmake -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=ON -DBUILD_TESTS=ON ..
+
+#to run clang tidy to make static analysis
+#cmake -DCMAKE_BUILD_TYPE=Debug -DENABLE_CLANG_TIDY=ON -DENABLE_COVERAGE=ON -DBUILD_TESTS=ON ..
+cmake -DCMAKE_BUILD_TYPE=Debug  -DENABLE_COVERAGE=ON -DBUILD_TESTS=ON ..
 cmake --build . -j 
 ctest --output-on-failure
 mkdir -p report

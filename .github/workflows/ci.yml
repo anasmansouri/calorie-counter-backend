@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-test-format-coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            cmake make g++ \
+            clang-format \
+            gcovr
+
+      - name: Configure (Debug + Coverage + Tests)
+        run: |
+          cmake -S . -B build \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DENABLE_COVERAGE=ON \
+            -DBUILD_TESTS=ON
+
+      - name: Build (includes tests)
+        run: cmake --build build -j
+
+      # This FAILS the CI if formatting is not correct (recommended)
+      - name: clang-format check
+        run: |
+          files=$(find src tests -name '*.cpp' -o -name '*.hpp' -o -name '*.h')
+          clang-format --dry-run --Werror $files
+
+      - name: Run tests
+        run: ctest --test-dir build --output-on-failure
+
+      - name: Generate coverage (HTML)
+        run: |
+          mkdir -p build/report
+          gcovr -r . --filter 'src' --html --html-details -o build/report/coverage.html
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html
+          path: build/report/coverage.html
