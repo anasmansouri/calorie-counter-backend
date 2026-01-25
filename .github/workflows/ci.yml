@@ -40,8 +40,7 @@ jobs:
       #    gcovr -r . --filter 'src' --html --html-details -o build/report/coverage.html
       #
 
-      - name:
-        Debug: find coverage html
+      - name: find coverage html
         run: |
           find . -maxdepth 4 -name "coverage*.html" -o -name "*.html"
       - name: Upload coverage report
