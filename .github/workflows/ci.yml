@@ -22,13 +22,13 @@ jobs:
 
       - name: Configure (Debug + Coverage + Tests)
         run: |
-          cmake -S . -B build \
-            -DCMAKE_BUILD_TYPE=Debug \
-            -DENABLE_COVERAGE=ON \
-            -DBUILD_TESTS=ON
+          ./buid_UT.sh
+          
 
       - name: Build (includes tests)
-        run: cmake --build build -j
+        run: 
+          ./buid_UT.sh
+
 
       # This FAILS the CI if formatting is not correct (recommended)
       - name: clang-format check
