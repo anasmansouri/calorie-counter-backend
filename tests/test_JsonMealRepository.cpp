@@ -1,31 +1,32 @@
+#include "models/food.hpp"
+#include "models/meal_log.hpp"
+#include "storage/JsonMealRepository.hpp"
+#include "utils/Result.hpp"
+#include "utils/date_time_utils.hpp"
 #include <bits/chrono.h>
 #include <chrono>
 #include <gtest/gtest.h>
 #include <iostream>
 #include <utility>
 #include <vector>
-#include "models/meal_log.hpp"
-#include "models/food.hpp"
-#include "storage/JsonMealRepository.hpp"
-#include "utils/Result.hpp"
-#include "utils/date_time_utils.hpp"
 
 using namespace cc::storage;
 
 class JsonMealRepositoryTest : public ::testing::Test {
-protected:
-    void SetUp() override {                // runs BEFORE each TEST_F
+  protected:
+    void SetUp() override { // runs BEFORE each TEST_F
     }
-   void TearDown() override {             // runs AFTER each TEST_F
-           // nothing to destroy                                //
+    void TearDown() override { // runs AFTER each TEST_F
+                               // nothing to destroy                                //
     }
 
     // helper functions and members visible to all TEST_F in this suite
 };
 
-TEST_F(JsonMealRepositoryTest,initializition) {
+TEST_F(JsonMealRepositoryTest, initializition) {
 
-    JsonMealRepository mealRepo("/home/anas/personal_projects/calorie-counter-backend/json_meal_data_base.json");
+    JsonMealRepository mealRepo(
+        "/home/anas/personal_projects/calorie-counter-backend/json_meal_data_base.json");
     cc::models::Food minina;
     minina.setId("2131654967498");
     minina.setName("minina");
@@ -37,12 +38,13 @@ TEST_F(JsonMealRepositoryTest,initializition) {
     minina.setImageUrl(std::string("https://example.com/granola.jpg"));
 
     cc::models::MealLog breakfast(cc::models::MEALNAME::Breakfast);
-    breakfast.addFoodItem(minina.id(),10);
+    breakfast.addFoodItem(minina.id(), 10);
     EXPECT_NO_THROW(mealRepo.save(breakfast));
-    }
+}
 
-TEST_F(JsonMealRepositoryTest,getById) {
-    JsonMealRepository mealRepo("/home/anas/personal_projects/calorie-counter-backend/json_meal_data_base.json");
+TEST_F(JsonMealRepositoryTest, getById) {
+    JsonMealRepository mealRepo(
+        "/home/anas/personal_projects/calorie-counter-backend/json_meal_data_base.json");
     cc::models::Food minina;
     minina.setId("2131654967498");
     minina.setName("minina");
@@ -54,18 +56,19 @@ TEST_F(JsonMealRepositoryTest,getById) {
     minina.setImageUrl(std::string("https://example.com/granola.jpg"));
 
     cc::models::MealLog breakfast(cc::models::MEALNAME::Breakfast);
-    // std::chrono::system_clock::time_point id_tsUtc_ = std::chrono::floor<std::chrono::seconds>(std::chrono::system_clock::now());
+    // std::chrono::system_clock::time_point id_tsUtc_ =
+    // std::chrono::floor<std::chrono::seconds>(std::chrono::system_clock::now());
     std::chrono::system_clock::time_point id_tsUtc_ = std::chrono::system_clock::now();
     breakfast.setTime(id_tsUtc_);
     breakfast.setId("anas");
-    breakfast.addFoodItem(minina.id(),10);
+    breakfast.addFoodItem(minina.id(), 10);
     EXPECT_NO_THROW(mealRepo.save(breakfast));
-    cc::utils::Result<cc::models::MealLog> result_meal= mealRepo.getById("anas");
-    std::cout<<"result meal id "<<result_meal.unwrap().id()<<std::endl;
-    std::cout<<"breakfast id "<<breakfast.id()<<std::endl;
+    cc::utils::Result<cc::models::MealLog> result_meal = mealRepo.getById("anas");
+    std::cout << "result meal id " << result_meal.unwrap().id() << std::endl;
+    std::cout << "breakfast id " << breakfast.id() << std::endl;
     EXPECT_EQ(result_meal.unwrap().id(), breakfast.id());
     EXPECT_EQ(result_meal.unwrap().getName(), breakfast.getName());
-    }
+}
 /*
 
 TEST_F(MealModelTest,setName) {
@@ -147,7 +150,7 @@ TEST_F(MealModelTest,setFoodItems) {
     EXPECT_EQ(breakfast.food_items()[1].second,50);
     }
 
-    
+
 */
 /*
 TEST(Math, Multiply) {

@@ -1,7 +1,7 @@
-#include"utils/Json_utils.hpp"
+#include "utils/Json_utils.hpp"
 
-namespace cc::utils{
-crow::json::wvalue  to_crow_json(const nlohmann::json& j) {
+namespace cc::utils {
+crow::json::wvalue to_crow_json(const nlohmann::json& j) {
     crow::json::wvalue result;
 
     if (j.is_object()) {
@@ -28,4 +28,4 @@ crow::json::wvalue  to_crow_json(const nlohmann::json& j) {
 
     return result;
 }
-}
+} // namespace cc::utils

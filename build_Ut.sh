@@ -5,7 +5,7 @@ cd build
 #cmake .. 
 #make 
 cmake -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=ON -DBUILD_TESTS=ON ..
-cmake --build . -j
+cmake --build . -j 
 ctest --output-on-failure
 mkdir -p report
 gcovr -r .. --filter '../src' --html --html-details -o report/coverage.html

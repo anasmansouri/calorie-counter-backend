@@ -1,6 +1,6 @@
 #pragma once
 
-//#todo  this file to be removed 
+// #todo  this file to be removed
 namespace cc {
 namespace models {
 

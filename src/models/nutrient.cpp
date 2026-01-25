@@ -6,37 +6,38 @@
 namespace cc {
 namespace models {
 
-    Nutrient::Nutrient(std::string name , double value , std::string unit):name_{name},value_{value},unit_{unit}{
-        std::cout<<"Nutrient "<<name<< " is created"<<std::endl;
-    }
+Nutrient::Nutrient(std::string name, double value, std::string unit)
+    : name_{name}, value_{value}, unit_{unit} {
+    std::cout << "Nutrient " << name << " is created" << std::endl;
+}
 
-    // Name
-    const std::string& Nutrient::name()const{
-        return this->name_;
-    }
-    void Nutrient::setName(std::string n){
-        this->name_=n;
-    }
-    
-    // value 
-    double Nutrient::value()const {
-        return this->value_;
-    }
-    void Nutrient::setValue(double v){
-        this->value_=v;
-    }
+// Name
+const std::string& Nutrient::name() const {
+    return this->name_;
+}
+void Nutrient::setName(std::string n) {
+    this->name_ = n;
+}
 
-    // Unit 
-    const std::string& Nutrient::unit()const{
-        return this->unit_;
-    }
+// value
+double Nutrient::value() const {
+    return this->value_;
+}
+void Nutrient::setValue(double v) {
+    this->value_ = v;
+}
 
-    void Nutrient::setUnit(std::string u){
-        this->unit_=u;
-    }
+// Unit
+const std::string& Nutrient::unit() const {
+    return this->unit_;
+}
 
-    std::string Nutrient::to_string()const {
-    return std::format("{} : {} : {}",this->name_,this->value_,this->unit_);
-    }
+void Nutrient::setUnit(std::string u) {
+    this->unit_ = u;
+}
+
+std::string Nutrient::to_string() const {
+    return std::format("{} : {} : {}", this->name_, this->value_, this->unit_);
+}
 } // namespace models
 } // namespace cc
