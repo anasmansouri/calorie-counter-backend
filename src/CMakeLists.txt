@@ -16,7 +16,10 @@ add_library(cc_utils
     utils/Json_utils.hpp utils/Json_utils.cpp
     utils/common_functions.cpp utils/common_functions.hpp 
 )
-target_include_directories(cc_utils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(
+    cc_utils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+    SYSTEM PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/third_party
+)
 
 #target_link_libraries(cc_utils PUBLIC magic_enum::magic_enum)
 # Models module
@@ -27,7 +30,10 @@ add_library(cc_models
     models/daily_log.hpp models/daily_log.cpp
     models/DTOs.hpp
 )
-target_include_directories(cc_models PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(
+    cc_models PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+    SYSTEM PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/third_party
+)
 target_link_libraries(cc_models PUBLIC magic_enum::magic_enum)
 target_link_libraries(cc_utils PUBLIC cc_models)
 # Clients module
@@ -40,7 +46,10 @@ find_package(CURL REQUIRED)
 #target_include_directories(cc_clients PRIVATE ${CURL_INCLUDE_DIRS})
 target_link_libraries(cc_clients PRIVATE ${CURL_LIBRARIES})
 
-target_include_directories(cc_clients PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(
+    cc_clients PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+    SYSTEM PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/third_party
+)
 target_link_libraries(cc_clients PUBLIC cc_utils)
 
 # Storage module
@@ -49,8 +58,12 @@ add_library(cc_storage
     storage/JsonFoodRepository.cpp storage/JsonFoodRepository.hpp
     storage/JsonMealRepository.cpp storage/JsonMealRepository.hpp
     storage/SqliteFoodRepository.cpp storage/SqliteFoodRepository.hpp
+    
 )
-target_include_directories(cc_storage PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(
+    cc_storage PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+    SYSTEM PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/third_party
+)
 target_link_libraries(cc_storage PUBLIC cc_models cc_utils)
 
 # Services module
@@ -66,7 +79,10 @@ target_link_libraries(cc_services PUBLIC cc_storage cc_clients cc_models cc_util
 #add_library(cc_api
 #    api/Server.cpp api/Server.hpp
 #)
-#target_include_directories(cc_api PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+#target_include_directories(
+#    cc_api PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+#    SYSTEM PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/third_party
+#)
 #target_link_libraries(cc_api PUBLIC cc_services cc_utils)
 #######################
 
@@ -84,6 +100,20 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(crow)
 find_package(Threads REQUIRED)
+
+
+
+# ---- clang-tidy (applies during build) ----
+#option(ENABLE_CLANG_TIDY "Enable clang-tidy analysis" OFF)
+#if(ENABLE_CLANG_TIDY)
+#  find_program(CLANG_TIDY_EXE NAMES clang-tidy)
+#  if(CLANG_TIDY_EXE)
+#    set(CMAKE_CXX_CLANG_TIDY
+#      ${CLANG_TIDY_EXE};
+#      -p=${CMAKE_BINARY_DIR}
+#    )
+#  endif()
+#endif()
 
 # Main executable
 #add_executable(cc_app main.cpp)

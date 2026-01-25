@@ -44,3 +44,24 @@ if (BUILD_TESTS)
   enable_testing()
   add_subdirectory(tests)
 endif()
+
+#############clang-format#############
+# ---- clang-format target ----
+find_program(CLANG_FORMAT_EXE NAMES clang-format)
+if(CLANG_FORMAT_EXE)
+  file(GLOB_RECURSE ALL_CXX_SOURCE_FILES
+    ${CMAKE_SOURCE_DIR}/src/*.[ch]pp
+    ${CMAKE_SOURCE_DIR}/src/*.[ch]
+    ${CMAKE_SOURCE_DIR}/tests/*.[ch]pp
+    ${CMAKE_SOURCE_DIR}/tests/*.[ch]
+  )
+
+  list(LENGTH ALL_CXX_SOURCE_FILES COUNT)
+  message(STATUS "clang-format will run on ${COUNT} files")
+
+  add_custom_target(format
+    COMMAND ${CLANG_FORMAT_EXE} -i ${ALL_CXX_SOURCE_FILES}
+    COMMENT "Running clang-format"
+  )
+endif()
+
