@@ -24,25 +24,6 @@ jobs:
         run: 
           ./build_Ut.sh
 
-
-      # This FAILS the CI if formatting is not correct (recommended)
-      # - name: clang-format check
-       #  run: |
-        #   files=$(find src tests -name '*.cpp' -o -name '*.hpp' -o -name '*.h')
-        #   clang-format --dry-run --Werror $files
-
-      #- name: Run tests
-      #  run: ctest --test-dir build --output-on-failure
-
-      #- name: Generate coverage (HTML)
-      #  run: |
-      #    mkdir -p build/report
-      #    gcovr -r . --filter 'src' --html --html-details -o build/report/coverage.html
-      #
-
-      - name: find coverage html
-        run: |
-          find . -maxdepth 4 -name "coverage*.html" -o -name "*.html"
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
         with:
