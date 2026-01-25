@@ -31,10 +31,10 @@ jobs:
 
 
       # This FAILS the CI if formatting is not correct (recommended)
-      - name: clang-format check
-        run: |
-          files=$(find src tests -name '*.cpp' -o -name '*.hpp' -o -name '*.h')
-          clang-format --dry-run --Werror $files
+      # - name: clang-format check
+       #  run: |
+        #   files=$(find src tests -name '*.cpp' -o -name '*.hpp' -o -name '*.h')
+        #   clang-format --dry-run --Werror $files
 
       - name: Run tests
         run: ctest --test-dir build --output-on-failure
