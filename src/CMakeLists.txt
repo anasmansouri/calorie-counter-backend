@@ -16,7 +16,13 @@ add_library(cc_utils
     utils/Json_utils.hpp utils/Json_utils.cpp
     utils/common_functions.cpp utils/common_functions.hpp 
 )
-target_include_directories(cc_utils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(
+    cc_utils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+target_include_directories(cc_utils
+    SYSTEM PUBLIC  ${CMAKE_SOURCE_DIR}/third_party
+)
 
 #target_link_libraries(cc_utils PUBLIC magic_enum::magic_enum)
 # Models module
@@ -27,7 +33,13 @@ add_library(cc_models
     models/daily_log.hpp models/daily_log.cpp
     models/DTOs.hpp
 )
-target_include_directories(cc_models PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(
+    cc_models PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+target_include_directories(cc_models
+    SYSTEM PUBLIC  ${CMAKE_SOURCE_DIR}/third_party
+)
 target_link_libraries(cc_models PUBLIC magic_enum::magic_enum)
 target_link_libraries(cc_utils PUBLIC cc_models)
 # Clients module
@@ -35,13 +47,22 @@ add_library(cc_clients
     clients/OpenFoodFactsClient.cpp clients/OpenFoodFactsClient.hpp
 )
 
+target_include_directories(cc_clients
+    SYSTEM PUBLIC  ${CMAKE_SOURCE_DIR}/third_party
+)
+
 # libcurl library 
 find_package(CURL REQUIRED)
 #target_include_directories(cc_clients PRIVATE ${CURL_INCLUDE_DIRS})
 target_link_libraries(cc_clients PRIVATE ${CURL_LIBRARIES})
 
-target_include_directories(cc_clients PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(
+    cc_clients PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 target_link_libraries(cc_clients PUBLIC cc_utils)
+
+
 
 # Storage module
 add_library(cc_storage
@@ -50,7 +71,13 @@ add_library(cc_storage
     storage/JsonMealRepository.cpp storage/JsonMealRepository.hpp
     storage/SqliteFoodRepository.cpp storage/SqliteFoodRepository.hpp
 )
-target_include_directories(cc_storage PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(
+    cc_storage PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+target_include_directories(
+    cc_storage SYSTEM PUBLIC  ${CMAKE_SOURCE_DIR}/third_party
+)
 target_link_libraries(cc_storage PUBLIC cc_models cc_utils)
 
 # Services module
@@ -59,7 +86,12 @@ add_library(cc_services
     services/AuthService.cpp services/AuthService.hpp
     services/UserService.cpp services/UserService.hpp
 )
-target_include_directories(cc_services PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(
+    cc_services PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+)
+target_include_directories(
+    cc_services SYSTEM PUBLIC  ${CMAKE_SOURCE_DIR}/third_party
+)
 target_link_libraries(cc_services PUBLIC cc_storage cc_clients cc_models cc_utils)
 
 # API module

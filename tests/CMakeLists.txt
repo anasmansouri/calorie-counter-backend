@@ -23,6 +23,10 @@ add_executable(cc_test_models
     test_service/test_food_service.cpp
     )
 
+target_include_directories(cc_test_models
+    SYSTEM PUBLIC  ${CMAKE_SOURCE_DIR}/third_party
+)
+
 target_link_libraries(cc_test_models PRIVATE
   cc_utils
   cc_models

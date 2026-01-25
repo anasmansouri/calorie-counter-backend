@@ -36,8 +36,8 @@ TEST_F(OpenFoodFactsClientModelTest,getByBarcode) {
     
     if(result){
         food = result.unwrap();
-        EXPECT_EQ(food.name(),"Gold Standard 100% Whey Double Rich Chocolate Flavour");
-        EXPECT_EQ(food.brand(),"Optimum Nutrition");
+        EXPECT_EQ(food.name(),"GOLD STANDARD 100% WHEY DOUBLE RICH CHOCOLATE");
+        EXPECT_EQ(food.brand(),"OPTIMUM NUTRITION");
         EXPECT_EQ(food.barcode().value(),"5060245600507");
         EXPECT_EQ(food.caloriesPer100g(),374);
         /////////////////////////////////////////////////////
