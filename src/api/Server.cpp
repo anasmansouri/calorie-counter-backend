@@ -1,7 +1,6 @@
 #include "Server.hpp"
 #include "models/food.hpp"
-#include "nlohmann/json.hpp"
-#include "utils/Result.hpp"
+#include "nlohmann/json.hpp" #include "utils/Result.hpp"
 #include <crow/app.h>
 #include <crow/common.h>
 #include <crow/http_request.h>
@@ -119,7 +118,7 @@ void Server::run() {
         new_food.setBarcode(body["barcode"].s());
         new_food.setCaloriesPer100g(body["caloriePer100g"].d());
         new_food.setServingSizeG(body["servingSizeG"].d()); // default serving size 40g
-        new_food.setSource("manual");
+        new_food.setSource(models::SOURCE::Manual);
         // new_food.setImageUrl(std::string("https://example.com/granola.jpg"));
         auto result = this->foodService_->updateFood(new_food);
         crow::json::wvalue response_json;

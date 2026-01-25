@@ -95,11 +95,11 @@ target_include_directories(
 target_link_libraries(cc_services PUBLIC cc_storage cc_clients cc_models cc_utils)
 
 # API module
-#add_library(cc_api
-#    api/Server.cpp api/Server.hpp
-#)
-#target_include_directories(cc_api PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-#target_link_libraries(cc_api PUBLIC cc_services cc_utils)
+add_library(cc_api
+    api/Server.cpp api/Server.hpp
+)
+target_include_directories(cc_api PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(cc_api PUBLIC cc_services cc_utils)
 #######################
 
 
