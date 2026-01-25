@@ -91,7 +91,7 @@ void Server::run() {
         new_food.setBarcode(body["barcode"].s());
         new_food.setCaloriesPer100g(body["caloriePer100g"].d());
         new_food.setServingSizeG(body["servingSizeG"].d()); // default serving size 40g
-        new_food.setSource("manual");
+        new_food.setSource(cc::models::SOURCE::Manual);
         // new_food.setImageUrl(std::string("https://example.com/granola.jpg"));
         auto result = this->foodService_->addManualFood(new_food);
         crow::json::wvalue response_json;
@@ -118,7 +118,7 @@ void Server::run() {
         new_food.setBarcode(body["barcode"].s());
         new_food.setCaloriesPer100g(body["caloriePer100g"].d());
         new_food.setServingSizeG(body["servingSizeG"].d()); // default serving size 40g
-        new_food.setSource(models::SOURCE::Manual);
+        new_food.setSource(cc::models::SOURCE::Manual);
         // new_food.setImageUrl(std::string("https://example.com/granola.jpg"));
         auto result = this->foodService_->updateFood(new_food);
         crow::json::wvalue response_json;
