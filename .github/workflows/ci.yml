@@ -22,12 +22,12 @@ jobs:
 
       - name: Configure (Debug + Coverage + Tests)
         run: |
-          ./buid_UT.sh
+          ./build_Ut.sh
           
 
       - name: Build (includes tests)
         run: 
-          ./buid_UT.sh
+          ./build_Ut.sh
 
 
       # This FAILS the CI if formatting is not correct (recommended)
