@@ -50,6 +50,7 @@ TEST_F(ServerTest , listFoods) {
     cc::services::FoodService food_service{repo_shared_ptr, client_ptr};
 
     Server server(8080,std::make_shared<cc::services::FoodService>(food_service)); 
+    server.start();
 }
 /*
 TEST_F(NutrientModelTest, setName) {

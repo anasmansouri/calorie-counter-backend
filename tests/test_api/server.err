@@ -1,0 +1,60 @@
+(2026-01-27 22:06:56) [INFO    ] Crow/master server is running at http://0.0.0.0:18080 using 16 threads
+(2026-01-27 22:06:56) [INFO    ] Call `app.loglevel(crow::LogLevel::Warning)` to hide Info level logs.
+(2026-01-27 22:06:57) [INFO    ] Request: 127.0.0.1:45796 0x7f01540062c0 HTTP/1.1 GET /health
+(2026-01-27 22:06:57) [INFO    ] Response: 0x7f01540062c0 /health 200 0
+(2026-01-27 22:06:57) [INFO    ] Request: 127.0.0.1:45798 0x7f0108000ca0 HTTP/1.1 GET /
+(2026-01-27 22:06:57) [INFO    ] Response: 0x7f0108000ca0 / 200 0
+(2026-01-27 22:06:57) [INFO    ] Request: 127.0.0.1:45802 0x7f01080022d0 HTTP/1.1 GET /health
+(2026-01-27 22:06:57) [INFO    ] Response: 0x7f01080022d0 /health 200 0
+(2026-01-27 22:06:57) [INFO    ] Request: 127.0.0.1:45812 0x7f0108003850 HTTP/1.1 GET /search_by_barcode
+(2026-01-27 22:06:57) [INFO    ] Response: 0x7f0108003850 /search_by_barcode 404 0
+(2026-01-27 22:06:57) [INFO    ] Request: 127.0.0.1:45814 0x7f01080022d0 HTTP/1.1 GET /search_by_barcode
+(2026-01-27 22:06:57) [INFO    ] Response: 0x7f01080022d0 /search_by_barcode?barcode= 404 0
+(2026-01-27 22:06:57) [INFO    ] Request: 127.0.0.1:45816 0x7f0108003850 HTTP/1.1 GET /search_by_barcode
+(2026-01-27 22:06:57) [INFO    ] Response: 0x7f0108003850 /search_by_barcode?barcode=4025500287955 200 0
+(2026-01-27 22:06:57) [INFO    ] Request: 127.0.0.1:45820 0x7f01080022d0 HTTP/1.1 POST /foods
+(2026-01-27 22:06:57) [INFO    ] Response: 0x7f01080022d0 /foods 400 0
+(2026-01-27 22:06:57) [INFO    ] Request: 127.0.0.1:45832 0x7f0108003850 HTTP/1.1 POST /foods
+(2026-01-27 22:06:57) [INFO    ] Response: 0x7f0108003850 /foods 200 0
+(2026-01-27 22:06:57) [INFO    ] Request: 127.0.0.1:45842 0x7f01080022d0 HTTP/1.1 GET /foods
+(2026-01-27 22:06:57) [INFO    ] Response: 0x7f01080022d0 /foods?offset=0&limit=50 200 0
+(2026-01-27 22:06:57) [INFO    ] Request: 127.0.0.1:45848 0x7f0108004ca0 HTTP/1.1 POST /foods
+(2026-01-27 22:06:57) [INFO    ] Response: 0x7f0108004ca0 /foods 200 0
+(2026-01-27 22:06:57) [INFO    ] Request: 127.0.0.1:45858 0x7f01080022d0 HTTP/1.1 PUT /foods
+(2026-01-27 22:06:57) [INFO    ] Response: 0x7f01080022d0 /foods 200 0
+(2026-01-27 22:06:57) [INFO    ] Request: 127.0.0.1:45864 0x7f0108003850 HTTP/1.1 GET /search_by_barcode
+(2026-01-27 22:06:57) [INFO    ] Response: 0x7f0108003850 /search_by_barcode?barcode=008 200 0
+(2026-01-27 22:06:57) [INFO    ] Closing acceptor. 0x7f0154001f78
+(2026-01-27 22:06:57) [INFO    ] Closing IO service 0x7f0154003280
+(2026-01-27 22:06:57) [INFO    ] Closing IO service 0x7f0154003288
+(2026-01-27 22:06:57) [INFO    ] Closing IO service 0x7f0154003290
+(2026-01-27 22:06:57) [INFO    ] Closing IO service 0x7f0154003298
+(2026-01-27 22:06:57) [INFO    ] Closing IO service 0x7f01540032a0
+(2026-01-27 22:06:57) [INFO    ] Closing IO service 0x7f01540032a8
+(2026-01-27 22:06:57) [INFO    ] Closing IO service 0x7f01540032b0
+(2026-01-27 22:06:57) [INFO    ] Closing IO service 0x7f01540032b8
+(2026-01-27 22:06:57) [INFO    ] Closing IO service 0x7f01540032c0
+(2026-01-27 22:06:57) [INFO    ] Closing IO service 0x7f01540032c8
+(2026-01-27 22:06:57) [INFO    ] Closing IO service 0x7f01540032d0
+(2026-01-27 22:06:57) [INFO    ] Closing IO service 0x7f01540032d8
+(2026-01-27 22:06:57) [INFO    ] Closing IO service 0x7f01540032e0
+(2026-01-27 22:06:57) [INFO    ] Closing IO service 0x7f01540032e8
+(2026-01-27 22:06:57) [INFO    ] Closing IO service 0x7f01540032f0
+(2026-01-27 22:06:57) [INFO    ] Closing main IO service (0x7f0154001f38)
+(2026-01-27 22:06:57) [INFO    ] Exiting.
+(2026-01-27 22:06:58) [INFO    ] Closing IO service 0x7f0154003280
+(2026-01-27 22:06:58) [INFO    ] Closing IO service 0x7f0154003288
+(2026-01-27 22:06:58) [INFO    ] Closing IO service 0x7f0154003290
+(2026-01-27 22:06:58) [INFO    ] Closing IO service 0x7f0154003298
+(2026-01-27 22:06:58) [INFO    ] Closing IO service 0x7f01540032a0
+(2026-01-27 22:06:58) [INFO    ] Closing IO service 0x7f01540032a8
+(2026-01-27 22:06:58) [INFO    ] Closing IO service 0x7f01540032b0
+(2026-01-27 22:06:58) [INFO    ] Closing IO service 0x7f01540032b8
+(2026-01-27 22:06:58) [INFO    ] Closing IO service 0x7f01540032c0
+(2026-01-27 22:06:58) [INFO    ] Closing IO service 0x7f01540032c8
+(2026-01-27 22:06:58) [INFO    ] Closing IO service 0x7f01540032d0
+(2026-01-27 22:06:58) [INFO    ] Closing IO service 0x7f01540032d8
+(2026-01-27 22:06:58) [INFO    ] Closing IO service 0x7f01540032e0
+(2026-01-27 22:06:58) [INFO    ] Closing IO service 0x7f01540032e8
+(2026-01-27 22:06:58) [INFO    ] Closing IO service 0x7f01540032f0
+(2026-01-27 22:06:58) [INFO    ] Closing main IO service (0x7f0154001f38)

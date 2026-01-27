@@ -1,0 +1,186 @@
+GET succeeded, body size = 5361
+ - brands
+ - categories_tags
+ - code
+ - countries_tags
+ - last_modified_t
+ - lc
+ - nutriments
+ - nutriscore_grade
+ - nutrition_data_per
+ - product_name
+ - quantity
+ - selected_images
+ - serving_size
+parsed succeeded
+[
+    {
+        "barcode": "4025500287955",
+        "brand": "Müller",
+        "caloriesPer100g": 46.0,
+        "id": "4025500287955",
+        "imageUrl": "https://images.openfoodfacts.org/images/products/402/550/028/7955/front_en.25.400.jpg",
+        "name": "Kefir - Pur",
+        "nutrient": [
+            {
+                "name": "protein",
+                "unit": "g",
+                "value": 3.4
+            },
+            {
+                "name": "carbohydrates",
+                "unit": "g",
+                "value": 4.1
+            },
+            {
+                "name": "fat",
+                "unit": "g",
+                "value": 1.5
+            }
+        ],
+        "servingSizeG": null,
+        "source": "Online"
+    }
+]
+[
+    {
+        "barcode": "4025500287955",
+        "brand": "Müller",
+        "caloriesPer100g": 46.0,
+        "id": "4025500287955",
+        "imageUrl": "https://images.openfoodfacts.org/images/products/402/550/028/7955/front_en.25.400.jpg",
+        "name": "Kefir - Pur",
+        "nutrient": [
+            {
+                "name": "protein",
+                "unit": "g",
+                "value": 3.4
+            },
+            {
+                "name": "carbohydrates",
+                "unit": "g",
+                "value": 4.1
+            },
+            {
+                "name": "fat",
+                "unit": "g",
+                "value": 1.5
+            }
+        ],
+        "servingSizeG": null,
+        "source": "Online"
+    },
+    {
+        "barcode": "007",
+        "brand": "PytestBrand",
+        "caloriesPer100g": 389.0,
+        "id": "007",
+        "imageUrl": "img_url_empty",
+        "name": "Oats",
+        "nutrient": [
+            {
+                "name": "protein",
+                "unit": "g",
+                "value": 3.4
+            },
+            {
+                "name": "carbohydrates",
+                "unit": "g",
+                "value": 4.1
+            },
+            {
+                "name": "fat",
+                "unit": "g",
+                "value": 1.5
+            }
+        ],
+        "servingSizeG": 40.0,
+        "source": "Manual"
+    }
+]
+[
+    {
+        "barcode": "4025500287955",
+        "brand": "Müller",
+        "caloriesPer100g": 46.0,
+        "id": "4025500287955",
+        "imageUrl": "https://images.openfoodfacts.org/images/products/402/550/028/7955/front_en.25.400.jpg",
+        "name": "Kefir - Pur",
+        "nutrient": [
+            {
+                "name": "protein",
+                "unit": "g",
+                "value": 3.4
+            },
+            {
+                "name": "carbohydrates",
+                "unit": "g",
+                "value": 4.1
+            },
+            {
+                "name": "fat",
+                "unit": "g",
+                "value": 1.5
+            }
+        ],
+        "servingSizeG": null,
+        "source": "Online"
+    },
+    {
+        "barcode": "007",
+        "brand": "PytestBrand",
+        "caloriesPer100g": 389.0,
+        "id": "007",
+        "imageUrl": "img_url_empty",
+        "name": "Oats",
+        "nutrient": [
+            {
+                "name": "protein",
+                "unit": "g",
+                "value": 3.4
+            },
+            {
+                "name": "carbohydrates",
+                "unit": "g",
+                "value": 4.1
+            },
+            {
+                "name": "fat",
+                "unit": "g",
+                "value": 1.5
+            }
+        ],
+        "servingSizeG": 40.0,
+        "source": "Manual"
+    },
+    {
+        "barcode": "008",
+        "brand": "PytestBrand",
+        "caloriesPer100g": 389.0,
+        "id": "008",
+        "imageUrl": "img_url_empty",
+        "name": "Oats",
+        "nutrient": [
+            {
+                "name": "protein",
+                "unit": "g",
+                "value": 3.4
+            },
+            {
+                "name": "carbohydrates",
+                "unit": "g",
+                "value": 4.1
+            },
+            {
+                "name": "fat",
+                "unit": "g",
+                "value": 1.5
+            }
+        ],
+        "servingSizeG": 40.0,
+        "source": "Manual"
+    }
+]
+serving running , click Enter to stop it : 
+destructor
+destructor

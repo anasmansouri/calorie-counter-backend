@@ -1,5 +1,6 @@
 #include "Server.hpp"
 #include "models/food.hpp"
+#include "models/nutrient.hpp"
 #include "nlohmann/json.hpp" 
 #include "utils/Result.hpp"
 #include <crow/app.h>
@@ -39,7 +40,7 @@ void Server::setupRoutes(){
         auto offset = req.url_params.get("offset");
         auto limit = req.url_params.get("limit");
         int offset_value = offset ? std::atoi(offset) : 0;
-        int limit_value = limit ? std::atoi(limit) : 0;
+        int limit_value = limit ? std::atoi(limit) : 50;
         cc::utils::Result<std::vector<cc::models::Food>> list_of_food =
             this->foodService_->listFoods(offset_value, limit_value);
         crow::json::wvalue response_json;
@@ -101,6 +102,7 @@ void Server::setupRoutes(){
             return crow::response(400, "invalid Json body");
         }
 
+        // #todo  no nutrition where added 
         cc::models::Food new_food;
         new_food.setId(body["id"].s());
         new_food.setName(body["name"].s());
@@ -109,6 +111,21 @@ void Server::setupRoutes(){
         new_food.setCaloriesPer100g(body["caloriePer100g"].d());
         new_food.setServingSizeG(body["servingSizeG"].d()); // default serving size 40g
         new_food.setSource(cc::models::SOURCE::Manual);
+        //new_food.setNutrients({{"Protein", 24, "g"}, {"Carbs", 100, "g"}});
+          // nutrition is optional
+        std::vector<cc::models::Nutrient> nutrients;
+        if (body.has("nutrient")) {
+             for (const auto& n : body["nutrient"]) {
+                 // Convert Crow json node -> string -> nlohmann::json -> Nutrient
+                    cc::models::Nutrient nutrient;
+                    nutrient.setName(n["name"].s());
+                    nutrient.setUnit(n["unit"].s());
+                    nutrient.setValue(n["value"].d());
+                    nutrients.push_back(nutrient);
+             }
+        }
+        new_food.setNutrients(nutrients);
+
         // new_food.setImageUrl(std::string("https://example.com/granola.jpg"));
         auto result = this->foodService_->addManualFood(new_food);
         crow::json::wvalue response_json;
@@ -136,6 +153,18 @@ void Server::setupRoutes(){
         new_food.setCaloriesPer100g(body["caloriePer100g"].d());
         new_food.setServingSizeG(body["servingSizeG"].d()); // default serving size 40g
         new_food.setSource(cc::models::SOURCE::Manual);
+        std::vector<cc::models::Nutrient> nutrients;
+        if (body.has("nutrient")) {
+             for (const auto& n : body["nutrient"]) {
+                 // Convert Crow json node -> string -> nlohmann::json -> Nutrient
+                    cc::models::Nutrient nutrient;
+                    nutrient.setName(n["name"].s());
+                    nutrient.setUnit(n["unit"].s());
+                    nutrient.setValue(n["value"].d());
+                    nutrients.push_back(nutrient);
+             }
+        }
+        new_food.setNutrients(nutrients);
         // new_food.setImageUrl(std::string("https://example.com/granola.jpg"));
         auto result = this->foodService_->updateFood(new_food);
         crow::json::wvalue response_json;
@@ -151,8 +180,7 @@ void Server::setupRoutes(){
     });
 }
 void Server::start() {
-   static std::once_flag once;
-   std::call_once(once, [this]{this->setupRoutes();});
+   std::call_once(this->once, [this]{this->setupRoutes();});
    //if(this->server_thread.joinable()){return;}
    
    try {
@@ -167,7 +195,7 @@ void Server::start() {
            // wait until thread reached the "running" point
            std::unique_lock<std::mutex> lk(m_);
            cv_.wait(lk, [this]{ return running_; });
-           std::this_thread::sleep_for(std::chrono::seconds(3));
+           std::this_thread::sleep_for(std::chrono::seconds(2));
    } catch (std::exception &e) {
        std::cerr<<"Server thread exception"<<e.what()<<std::endl;
        std::terminate();

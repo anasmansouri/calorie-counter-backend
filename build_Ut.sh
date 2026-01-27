@@ -15,5 +15,6 @@ mkdir -p report
 gcovr -r .. --filter '../src' --html --html-details -o report/coverage.html
 #./bin/cc_test_models
 #./bin/cc_test_models
+find .. -name "*.gcov" -delete
 ./bin/cc_app
 #gdb ./bin/cc_app

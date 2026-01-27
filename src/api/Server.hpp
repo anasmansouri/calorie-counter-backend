@@ -40,6 +40,7 @@ class Server {
     std::mutex m_;
     std::condition_variable cv_;
     bool running_ = false;
+    std::once_flag once;
     // std::shared_ptr<cc::services::AuthService> auth_;
 };
 

@@ -21,17 +21,7 @@ using namespace cc::services;
 class FoodServiceTest : public ::testing::Test {
   protected:
     void SetUp() override { // runs BEFORE each TEST_F
-                            /*
-                    
-cc::storage::JsonFoodRepository
-                    repo{"/home/anas/personal_projects/calorie-counter-backend/json_data_base.json"};
-cc::clients::OpenFoodFactsClient client;
-std::shared_ptr<cc::storage::JsonFoodRepository> repo_shared_ptr=
-                    std::make_shared<cc::storage::JsonFoodRepository>(repo);
-std::shared_ptr<cc::clients::OpenFoodFactsClient> client_ptr =
-                    std::make_shared<cc::clients::OpenFoodFactsClient>(client);                     FoodService
-                    food_service{repo_shared_ptr,client_ptr};
-*/
+
     }
 
     void TearDown() override { // runs AFTER each TEST_F

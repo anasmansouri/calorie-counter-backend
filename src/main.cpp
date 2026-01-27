@@ -341,7 +341,7 @@ int main() {
     cc::api::Server server(18080,std::make_shared<cc::services::FoodService>(food_service));
     //server.setupRoutes();
     server.start();
-    std::cout<<"out of server"<<std::endl;
+    std::cout<<"serving running , click Enter to stop it : "<<std::endl;
     
     std::string line;
     std::getline(std::cin, line);   // press Enter to stop
