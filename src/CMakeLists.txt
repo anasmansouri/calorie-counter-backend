@@ -118,8 +118,8 @@ FetchContent_MakeAvailable(crow)
 find_package(Threads REQUIRED)
 
 # Main executable
-#add_executable(cc_app main.cpp)
-#target_link_libraries(cc_app PRIVATE cc_api ${CURL_LIBRARIES})
-#target_link_libraries(cc_app PRIVATE Crow::Crow)
-#target_link_libraries(cc_app PRIVATE cc_api)
-#target_link_libraries(cc_app PRIVATE Threads::Threads)
+add_executable(cc_app main.cpp)
+target_link_libraries(cc_app PRIVATE cc_api ${CURL_LIBRARIES})
+target_link_libraries(cc_app PRIVATE Crow::Crow)
+target_link_libraries(cc_app PRIVATE cc_api)
+target_link_libraries(cc_app PRIVATE Threads::Threads)

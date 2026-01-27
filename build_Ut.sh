@@ -1,5 +1,6 @@
 #!/bin/bash
 #rm json_data_base.json
+mkdir -p build
 cd build
 #rm -r *
 #cmake .. 
@@ -13,4 +14,6 @@ ctest --output-on-failure
 mkdir -p report
 gcovr -r .. --filter '../src' --html --html-details -o report/coverage.html
 #./bin/cc_test_models
+#./bin/cc_test_models
+./bin/cc_app
 #gdb ./bin/cc_app

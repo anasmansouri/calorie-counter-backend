@@ -1,12 +1,18 @@
 #include "Server.hpp"
 #include "models/food.hpp"
-#include "nlohmann/json.hpp" #include "utils/Result.hpp"
+#include "nlohmann/json.hpp" 
+#include "utils/Result.hpp"
 #include <crow/app.h>
 #include <crow/common.h>
 #include <crow/http_request.h>
 #include <crow/http_response.h>
 #include <crow/json.h>
 #include <cstdlib>
+#include <exception>
+#include <iostream>
+#include <mutex>
+#include <string>
+#include <thread>
 #include <vector>
 
 namespace cc {
@@ -14,18 +20,22 @@ namespace api {
 
 // TODO: implement your classes/functions here
 
+
 Server::Server(int port, std::shared_ptr<cc::services::FoodService> service)
     : port_{port}, foodService_{service} {}
-void Server::run() {
-    crow::SimpleApp app;
-    CROW_ROUTE(app, "/").methods(crow::HTTPMethod::Get)([]() { return "Hello, Crow!"; });
-    CROW_ROUTE(app, "/health").methods(crow::HTTPMethod::Get)([]() {
+Server::~Server(){
+    this->stop();
+}
+void Server::setupRoutes(){
+
+ CROW_ROUTE(this->app, "/").methods(crow::HTTPMethod::Get)([]() { return "Hello, Crow!"; });
+    CROW_ROUTE(this->app, "/health").methods(crow::HTTPMethod::Get)([]() {
         crow::json::wvalue j;
         j["status"] = "ok";
         return crow::response{j};
     });
 
-    CROW_ROUTE(app, "/foods").methods(crow::HTTPMethod::Get)([this](const crow::request& req) {
+    CROW_ROUTE(this->app, "/foods").methods(crow::HTTPMethod::Get)([this](const crow::request& req) {
         auto offset = req.url_params.get("offset");
         auto limit = req.url_params.get("limit");
         int offset_value = offset ? std::atoi(offset) : 0;
@@ -44,12 +54,19 @@ void Server::run() {
                 response_json);
         }
     });
-    CROW_ROUTE(app, "/search_by_barcode")
+    CROW_ROUTE(this->app, "/search_by_barcode")
         .methods(crow::HTTPMethod::Get)([this](const crow::request& req) {
             auto barcode = req.url_params.get("barcode");
+            crow::json::wvalue response_json;
+            // test this 
+            if(barcode==nullptr || std::string(barcode).empty()){
+                    response_json["error"] = "missed barcode";
+                    return crow::response(404,
+                                      response_json);
+            } 
             cc::utils::Result<cc::models::Food> founded_food =
                 this->foodService_->getOrFetchByBarcode(barcode);
-            crow::json::wvalue response_json;
+            
             if (founded_food) {
                 nlohmann::json founded_food_json = founded_food.unwrap();
                 response_json = cc::utils::to_crow_json(founded_food_json);
@@ -62,7 +79,7 @@ void Server::run() {
             }
         });
 
-    CROW_ROUTE(app, "/foods").methods(crow::HTTPMethod::DELETE)([this](const crow::request& req) {
+    CROW_ROUTE(this->app, "/foods").methods(crow::HTTPMethod::DELETE)([this](const crow::request& req) {
         auto barcode = req.url_params.get("barcode");
         cc::utils::Result<void> result;
         result = this->foodService_->deleteFood(barcode);
@@ -78,7 +95,7 @@ void Server::run() {
         }
     });
 
-    CROW_ROUTE(app, "/foods").methods(crow::HTTPMethod::POST)([this](const crow::request& req) {
+    CROW_ROUTE(this->app, "/foods").methods(crow::HTTPMethod::POST)([this](const crow::request& req) {
         auto body = crow::json::load(req.body);
         if (!body) {
             return crow::response(400, "invalid Json body");
@@ -105,7 +122,7 @@ void Server::run() {
                 response_json);
         }
     });
-    CROW_ROUTE(app, "/foods").methods(crow::HTTPMethod::PUT)([this](const crow::request& req) {
+    CROW_ROUTE(this->app, "/foods").methods(crow::HTTPMethod::PUT)([this](const crow::request& req) {
         auto body = crow::json::load(req.body);
         if (!body) {
             return crow::response(400, "invalid Json body");
@@ -132,26 +149,37 @@ void Server::run() {
                 response_json);
         }
     });
-    app.port(this->port_).multithreaded().run();
+}
+void Server::start() {
+   static std::once_flag once;
+   std::call_once(once, [this]{this->setupRoutes();});
+   //if(this->server_thread.joinable()){return;}
+   
+   try {
+        this->server_thread =std::thread([this]{
+                 {
+                    std::lock_guard<std::mutex> lk(m_);
+                    running_ = true;
+                  }
+                    cv_.notify_one();
+                    this->app.port(this->port_).multithreaded().run();
+           });
+           // wait until thread reached the "running" point
+           std::unique_lock<std::mutex> lk(m_);
+           cv_.wait(lk, [this]{ return running_; });
+           std::this_thread::sleep_for(std::chrono::seconds(3));
+   } catch (std::exception &e) {
+       std::cerr<<"Server thread exception"<<e.what()<<std::endl;
+       std::terminate();
+   }
+}
+void Server::stop(){
+    std::cout<<"destructor"<<std::endl;
+    if(this->server_thread.joinable()){
+        this->app.stop();
+        this->server_thread.join();
+    }
 }
 void Server::enableCors(bool enable) {}
 } // namespace api
-} // namespace cc
-  //
-/*
-class Server {
-public:
-  Server(int port,
-         std::shared_ptr<cc::services::FoodService> service ,
-         std::shared_ptr<cc::services::AuthService> auth = nullptr);
-
-  void run();
-  void enableCors(bool enable);
-
-private:
-  int port_;
-  bool cors_ = false;
-  std::shared_ptr<cc::services::FoodService> foodService_;
-  // std::shared_ptr<cc::services::AuthService> auth_;
-};
-*/
+}
