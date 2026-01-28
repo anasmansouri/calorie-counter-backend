@@ -19,241 +19,237 @@
 using namespace cc::services;
 
 class FoodServiceTest : public ::testing::Test {
-  protected:
-    void SetUp() override { // runs BEFORE each TEST_F
+protected:
+  void SetUp() override { // runs BEFORE each TEST_F
+  }
 
-    }
+  void TearDown() override { // runs AFTER each TEST_F
+                             // nothing to destroy //
+  }
+  std::string path_to_temp_db{"/tmp/cc_UT_test_db.json"};
+  std::string wrong_path_to_temp_db{"/tmmp/cc_UT_test_db.json"};
 
-    void TearDown() override { // runs AFTER each TEST_F
-                               // nothing to destroy                                //
-    }
-
-    // helper functions and members visible to all TEST_F in this suite
+  // helper functions and members visible to all TEST_F in this suite
 };
 
 TEST_F(FoodServiceTest, listFoods) {
-    cc::clients::OpenFoodFactsClient client;
-    std::shared_ptr<cc::storage::JsonFoodRepository> repo_shared_ptr =
-        std::make_shared<cc::storage::JsonFoodRepository>(
-            "/home/anas/personal_projects/calorie-counter-backend/json_data_base.json");
-    std::shared_ptr<cc::clients::OpenFoodFactsClient> client_ptr =
-        std::make_shared<cc::clients::OpenFoodFactsClient>(client);
-    FoodService food_service{repo_shared_ptr, client_ptr};
-    food_service.clear_data_base();
-    EXPECT_EQ(food_service.listFoods().unwrap().size(), 0);
+  cc::clients::OpenFoodFactsClient client;
+  std::shared_ptr<cc::storage::JsonFoodRepository> repo_shared_ptr =
+      std::make_shared<cc::storage::JsonFoodRepository>(path_to_temp_db);
+  std::shared_ptr<cc::clients::OpenFoodFactsClient> client_ptr =
+      std::make_shared<cc::clients::OpenFoodFactsClient>(client);
+  FoodService food_service{repo_shared_ptr, client_ptr};
+  food_service.clear_data_base();
+  EXPECT_EQ(food_service.listFoods().unwrap().size(), 0);
 }
 TEST_F(FoodServiceTest, listFoods_data_base_path_is_wrong) {
-    cc::clients::OpenFoodFactsClient client;
-    std::shared_ptr<cc::storage::JsonFoodRepository> repo_shared_ptr =
-        std::make_shared<cc::storage::JsonFoodRepository>(
-            "/home/anasss/personal_projects/calorie-counter-backend/json_data_base.json");
-    std::shared_ptr<cc::clients::OpenFoodFactsClient> client_ptr =
-        std::make_shared<cc::clients::OpenFoodFactsClient>(client);
-    FoodService food_service{repo_shared_ptr, client_ptr};
-    ;
-    EXPECT_EQ(food_service.clear_data_base().unwrap_error().code,
-              cc::utils::ErrorCode::StorageError);
-    EXPECT_EQ(food_service.listFoods().unwrap_error().code, cc::utils::ErrorCode::NotFound);
+  cc::clients::OpenFoodFactsClient client;
+  std::shared_ptr<cc::storage::JsonFoodRepository> repo_shared_ptr =
+      std::make_shared<cc::storage::JsonFoodRepository>(wrong_path_to_temp_db);
+  std::shared_ptr<cc::clients::OpenFoodFactsClient> client_ptr =
+      std::make_shared<cc::clients::OpenFoodFactsClient>(client);
+  FoodService food_service{repo_shared_ptr, client_ptr};
+  ;
+  EXPECT_EQ(food_service.clear_data_base().unwrap_error().code,
+            cc::utils::ErrorCode::StorageError);
+  EXPECT_EQ(food_service.listFoods().unwrap_error().code,
+            cc::utils::ErrorCode::NotFound);
 }
 TEST_F(FoodServiceTest, addManualFood) {
-    cc::clients::OpenFoodFactsClient client;
-    std::shared_ptr<cc::storage::JsonFoodRepository> repo_shared_ptr =
-        std::make_shared<cc::storage::JsonFoodRepository>(
-            "/home/anas/personal_projects/calorie-counter-backend/json_data_base.json");
-    std::shared_ptr<cc::clients::OpenFoodFactsClient> client_ptr =
-        std::make_shared<cc::clients::OpenFoodFactsClient>(client);
-    FoodService food_service{repo_shared_ptr, client_ptr};
-    food_service.clear_data_base();
-    EXPECT_EQ(food_service.listFoods().unwrap().size(), 0);
-    cc::models::Food food;
-    food.setId("00000");
-    food.setName("minina");
-    food.setBrand("Aicha");
-    food.setBarcode("0707070");
-    food.setCaloriesPer100g(200);
-    food.setServingSizeG(100);
-    food.setSource(cc::models::SOURCE::Manual);
-    food.setImageUrl(std::string("https://example.com/granola.jpg"));
-    food.setNutrients({{"Protein", 24, "g"}, {"Carbs", 100, "g"}});
-    food_service.addManualFood(food);
-    EXPECT_EQ(food_service.listFoods().unwrap().size(), 1);
+  cc::clients::OpenFoodFactsClient client;
+  std::shared_ptr<cc::storage::JsonFoodRepository> repo_shared_ptr =
+      std::make_shared<cc::storage::JsonFoodRepository>(path_to_temp_db);
+  std::shared_ptr<cc::clients::OpenFoodFactsClient> client_ptr =
+      std::make_shared<cc::clients::OpenFoodFactsClient>(client);
+  FoodService food_service{repo_shared_ptr, client_ptr};
+  food_service.clear_data_base();
+  EXPECT_EQ(food_service.listFoods().unwrap().size(), 0);
+  cc::models::Food food;
+  food.setId("00000");
+  food.setName("minina");
+  food.setBrand("Aicha");
+  food.setBarcode("0707070");
+  food.setCaloriesPer100g(200);
+  food.setServingSizeG(100);
+  food.setSource(cc::models::SOURCE::Manual);
+  food.setImageUrl(std::string("https://example.com/granola.jpg"));
+  food.setNutrients({{"Protein", 24, "g"}, {"Carbs", 100, "g"}});
+  food_service.addManualFood(food);
+  EXPECT_EQ(food_service.listFoods().unwrap().size(), 1);
 }
 
 TEST_F(FoodServiceTest, addManualFood_wrong_path_to_data_base) {
-    cc::clients::OpenFoodFactsClient client;
-    std::shared_ptr<cc::storage::JsonFoodRepository> repo_shared_ptr =
-        std::make_shared<cc::storage::JsonFoodRepository>(
-            "/home/anasss/personal_projects/calorie-counter-backend/json_data_base.json");
-    std::shared_ptr<cc::clients::OpenFoodFactsClient> client_ptr =
-        std::make_shared<cc::clients::OpenFoodFactsClient>(client);
-    FoodService food_service{repo_shared_ptr, client_ptr};
-    cc::models::Food food;
-    food.setId("00000");
-    food.setName("minina");
-    food.setBrand("Aicha");
-    food.setBarcode("0707070");
-    food.setCaloriesPer100g(200);
-    food.setServingSizeG(100);
-    food.setSource(cc::models::SOURCE::Manual);
-    food.setImageUrl(std::string("https://example.com/granola.jpg"));
-    food.setNutrients({{"Protein", 24, "g"}, {"Carbs", 100, "g"}});
-    food_service.addManualFood(food);
-    EXPECT_EQ(food_service.listFoods().unwrap_error().code, cc::utils::ErrorCode::NotFound);
-    EXPECT_EQ(food_service.addManualFood(food).unwrap_error().code,
-              cc::utils::ErrorCode::StorageError);
+  cc::clients::OpenFoodFactsClient client;
+  std::shared_ptr<cc::storage::JsonFoodRepository> repo_shared_ptr =
+      std::make_shared<cc::storage::JsonFoodRepository>(wrong_path_to_temp_db);
+  std::shared_ptr<cc::clients::OpenFoodFactsClient> client_ptr =
+      std::make_shared<cc::clients::OpenFoodFactsClient>(client);
+  FoodService food_service{repo_shared_ptr, client_ptr};
+  cc::models::Food food;
+  food.setId("00000");
+  food.setName("minina");
+  food.setBrand("Aicha");
+  food.setBarcode("0707070");
+  food.setCaloriesPer100g(200);
+  food.setServingSizeG(100);
+  food.setSource(cc::models::SOURCE::Manual);
+  food.setImageUrl(std::string("https://example.com/granola.jpg"));
+  food.setNutrients({{"Protein", 24, "g"}, {"Carbs", 100, "g"}});
+  food_service.addManualFood(food);
+  EXPECT_EQ(food_service.listFoods().unwrap_error().code,
+            cc::utils::ErrorCode::NotFound);
+  EXPECT_EQ(food_service.addManualFood(food).unwrap_error().code,
+            cc::utils::ErrorCode::StorageError);
 }
 
 TEST_F(FoodServiceTest, updateFood) {
-    cc::clients::OpenFoodFactsClient client;
-    std::shared_ptr<cc::storage::JsonFoodRepository> repo_shared_ptr =
-        std::make_shared<cc::storage::JsonFoodRepository>(
-            "/home/anas/personal_projects/calorie-counter-backend/json_data_base_temp_.json");
-    std::shared_ptr<cc::clients::OpenFoodFactsClient> client_ptr =
-        std::make_shared<cc::clients::OpenFoodFactsClient>(client);
-    FoodService food_service{repo_shared_ptr, client_ptr};
-    food_service.clear_data_base();
-    EXPECT_EQ(food_service.listFoods().unwrap().size(), 0);
-    cc::models::Food food;
-    food.setId("00000");
-    food.setName("minina");
-    food.setBrand("Aicha");
-    food.setBarcode("0707070");
-    food.setCaloriesPer100g(200);
-    food.setServingSizeG(100);
-    food.setSource(cc::models::SOURCE::Manual);
-    food.setImageUrl(std::string("https://example.com/granola.jpg"));
-    food.setNutrients({{"Protein", 24, "g"}, {"Carbs", 100, "g"}});
-    food_service.addManualFood(food);
-    EXPECT_EQ(food_service.listFoods().unwrap().size(), 1);
-    food.setName("new name");
-    food_service.updateFood(food);
-    EXPECT_EQ(food_service.listFoods().unwrap()[0].name(), food.name());
-    std::remove("/home/anas/personal_projects/calorie-counter-backend/json_data_base_temp_.json");
+  cc::clients::OpenFoodFactsClient client;
+  std::shared_ptr<cc::storage::JsonFoodRepository> repo_shared_ptr =
+      std::make_shared<cc::storage::JsonFoodRepository>(path_to_temp_db);
+  std::shared_ptr<cc::clients::OpenFoodFactsClient> client_ptr =
+      std::make_shared<cc::clients::OpenFoodFactsClient>(client);
+  FoodService food_service{repo_shared_ptr, client_ptr};
+  food_service.clear_data_base();
+  EXPECT_EQ(food_service.listFoods().unwrap().size(), 0);
+  cc::models::Food food;
+  food.setId("00000");
+  food.setName("minina");
+  food.setBrand("Aicha");
+  food.setBarcode("0707070");
+  food.setCaloriesPer100g(200);
+  food.setServingSizeG(100);
+  food.setSource(cc::models::SOURCE::Manual);
+  food.setImageUrl(std::string("https://example.com/granola.jpg"));
+  food.setNutrients({{"Protein", 24, "g"}, {"Carbs", 100, "g"}});
+  food_service.addManualFood(food);
+  EXPECT_EQ(food_service.listFoods().unwrap().size(), 1);
+  food.setName("new name");
+  food_service.updateFood(food);
+  EXPECT_EQ(food_service.listFoods().unwrap()[0].name(), food.name());
+  std::remove(path_to_temp_db.c_str());
 }
 
 TEST_F(FoodServiceTest, updateFood_wrong_path_to_data_base) {
-    cc::clients::OpenFoodFactsClient client;
-    std::shared_ptr<cc::storage::JsonFoodRepository> repo_shared_ptr =
-        std::make_shared<cc::storage::JsonFoodRepository>(
-            "/home/anasss/personal_projects/calorie-counter-backend/json_data_base.json");
-    std::shared_ptr<cc::clients::OpenFoodFactsClient> client_ptr =
-        std::make_shared<cc::clients::OpenFoodFactsClient>(client);
-    FoodService food_service{repo_shared_ptr, client_ptr};
-    cc::models::Food food;
-    food.setId("00000");
-    food.setName("minina");
-    food.setBrand("Aicha");
-    food.setBarcode("0707070");
-    food.setCaloriesPer100g(200);
-    food.setServingSizeG(100);
-    food.setSource(cc::models::SOURCE::Manual);
-    food.setImageUrl(std::string("https://example.com/granola.jpg"));
-    food.setNutrients({{"Protein", 24, "g"}, {"Carbs", 100, "g"}});
-    EXPECT_EQ(food_service.addManualFood(food).unwrap_error().code,
-              cc::utils::ErrorCode::StorageError);
-    EXPECT_EQ(food_service.updateFood(food).unwrap_error().code,
-              cc::utils::ErrorCode::StorageError);
+  cc::clients::OpenFoodFactsClient client;
+  std::shared_ptr<cc::storage::JsonFoodRepository> repo_shared_ptr =
+      std::make_shared<cc::storage::JsonFoodRepository>(wrong_path_to_temp_db);
+  std::shared_ptr<cc::clients::OpenFoodFactsClient> client_ptr =
+      std::make_shared<cc::clients::OpenFoodFactsClient>(client);
+  FoodService food_service{repo_shared_ptr, client_ptr};
+  cc::models::Food food;
+  food.setId("00000");
+  food.setName("minina");
+  food.setBrand("Aicha");
+  food.setBarcode("0707070");
+  food.setCaloriesPer100g(200);
+  food.setServingSizeG(100);
+  food.setSource(cc::models::SOURCE::Manual);
+  food.setImageUrl(std::string("https://example.com/granola.jpg"));
+  food.setNutrients({{"Protein", 24, "g"}, {"Carbs", 100, "g"}});
+  EXPECT_EQ(food_service.addManualFood(food).unwrap_error().code,
+            cc::utils::ErrorCode::StorageError);
+  EXPECT_EQ(food_service.updateFood(food).unwrap_error().code,
+            cc::utils::ErrorCode::StorageError);
 }
 
 TEST_F(FoodServiceTest, deleteFood) {
-    cc::clients::OpenFoodFactsClient client;
-    std::shared_ptr<cc::storage::JsonFoodRepository> repo_shared_ptr =
-        std::make_shared<cc::storage::JsonFoodRepository>(
-            "/home/anas/personal_projects/calorie-counter-backend/json_data_base_temp_.json");
-    std::shared_ptr<cc::clients::OpenFoodFactsClient> client_ptr =
-        std::make_shared<cc::clients::OpenFoodFactsClient>(client);
-    FoodService food_service{repo_shared_ptr, client_ptr};
-    food_service.clear_data_base();
-    EXPECT_EQ(food_service.listFoods().unwrap().size(), 0);
-    cc::models::Food food;
-    food.setId("00000");
-    food.setName("minina");
-    food.setBrand("Aicha");
-    food.setBarcode("0707070");
-    food.setCaloriesPer100g(200);
-    food.setServingSizeG(100);
-    food.setSource(cc::models::SOURCE::Manual);
-    food.setImageUrl(std::string("https://example.com/granola.jpg"));
-    food.setNutrients({{"Protein", 24, "g"}, {"Carbs", 100, "g"}});
-    food_service.addManualFood(food);
-    EXPECT_EQ(food_service.listFoods().unwrap().size(), 1);
-    EXPECT_EQ(food_service.listFoods().unwrap()[0].name(), food.name());
-    EXPECT_EQ(food_service.listFoods().unwrap()[0].id(), food.id());
-    food_service.deleteFood(food.id());
-    std::remove("/home/anas/personal_projects/calorie-counter-backend/json_data_base_temp_.json");
+  cc::clients::OpenFoodFactsClient client;
+  std::shared_ptr<cc::storage::JsonFoodRepository> repo_shared_ptr =
+      std::make_shared<cc::storage::JsonFoodRepository>(path_to_temp_db);
+  std::shared_ptr<cc::clients::OpenFoodFactsClient> client_ptr =
+      std::make_shared<cc::clients::OpenFoodFactsClient>(client);
+  FoodService food_service{repo_shared_ptr, client_ptr};
+  food_service.clear_data_base();
+  EXPECT_EQ(food_service.listFoods().unwrap().size(), 0);
+  cc::models::Food food;
+  food.setId("00000");
+  food.setName("minina");
+  food.setBrand("Aicha");
+  food.setBarcode("0707070");
+  food.setCaloriesPer100g(200);
+  food.setServingSizeG(100);
+  food.setSource(cc::models::SOURCE::Manual);
+  food.setImageUrl(std::string("https://example.com/granola.jpg"));
+  food.setNutrients({{"Protein", 24, "g"}, {"Carbs", 100, "g"}});
+  food_service.addManualFood(food);
+  EXPECT_EQ(food_service.listFoods().unwrap().size(), 1);
+  EXPECT_EQ(food_service.listFoods().unwrap()[0].name(), food.name());
+  EXPECT_EQ(food_service.listFoods().unwrap()[0].id(), food.id());
+  food_service.deleteFood(food.id());
+  std::remove(path_to_temp_db.c_str());
 }
 
 TEST_F(FoodServiceTest, deleteFood_wrong_id) {
-    cc::clients::OpenFoodFactsClient client;
-    std::shared_ptr<cc::storage::JsonFoodRepository> repo_shared_ptr =
-        std::make_shared<cc::storage::JsonFoodRepository>(
-            "/home/anas/personal_projects/calorie-counter-backend/json_data_base_temp_.json");
-    std::shared_ptr<cc::clients::OpenFoodFactsClient> client_ptr =
-        std::make_shared<cc::clients::OpenFoodFactsClient>(client);
-    FoodService food_service{repo_shared_ptr, client_ptr};
-    food_service.clear_data_base();
-    EXPECT_EQ(food_service.listFoods().unwrap().size(), 0);
-    cc::models::Food food;
-    food.setId("00000");
-    food.setName("minina");
-    food.setBrand("Aicha");
-    food.setBarcode("0707070");
-    food.setCaloriesPer100g(200);
-    food.setServingSizeG(100);
-    food.setSource(cc::models::SOURCE::Manual);
-    food.setImageUrl(std::string("https://example.com/granola.jpg"));
-    food.setNutrients({{"Protein", 24, "g"}, {"Carbs", 100, "g"}});
-    food_service.addManualFood(food);
-    EXPECT_EQ(food_service.listFoods().unwrap().size(), 1);
-    EXPECT_EQ(food_service.listFoods().unwrap()[0].name(), food.name());
-    EXPECT_EQ(food_service.listFoods().unwrap()[0].id(), food.id());
-    std::string wrong_id = std::format("{}+wrong", food.id());
-    food_service.deleteFood(wrong_id);
-    EXPECT_EQ(food_service.deleteFood(wrong_id).unwrap_error().code,
-              cc::utils::ErrorCode::StorageError);
-    EXPECT_EQ(food_service.listFoods().unwrap().size(), 1);
-    std::remove("/home/anas/personal_projects/calorie-counter-backend/json_data_base_temp_.json");
+  cc::clients::OpenFoodFactsClient client;
+  std::shared_ptr<cc::storage::JsonFoodRepository> repo_shared_ptr =
+      std::make_shared<cc::storage::JsonFoodRepository>(path_to_temp_db);
+  std::shared_ptr<cc::clients::OpenFoodFactsClient> client_ptr =
+      std::make_shared<cc::clients::OpenFoodFactsClient>(client);
+  FoodService food_service{repo_shared_ptr, client_ptr};
+  food_service.clear_data_base();
+  EXPECT_EQ(food_service.listFoods().unwrap().size(), 0);
+  cc::models::Food food;
+  food.setId("00000");
+  food.setName("minina");
+  food.setBrand("Aicha");
+  food.setBarcode("0707070");
+  food.setCaloriesPer100g(200);
+  food.setServingSizeG(100);
+  food.setSource(cc::models::SOURCE::Manual);
+  food.setImageUrl(std::string("https://example.com/granola.jpg"));
+  food.setNutrients({{"Protein", 24, "g"}, {"Carbs", 100, "g"}});
+  food_service.addManualFood(food);
+  EXPECT_EQ(food_service.listFoods().unwrap().size(), 1);
+  EXPECT_EQ(food_service.listFoods().unwrap()[0].name(), food.name());
+  EXPECT_EQ(food_service.listFoods().unwrap()[0].id(), food.id());
+  std::string wrong_id = std::format("{}+wrong", food.id());
+  food_service.deleteFood(wrong_id);
+  EXPECT_EQ(food_service.deleteFood(wrong_id).unwrap_error().code,
+            cc::utils::ErrorCode::StorageError);
+  EXPECT_EQ(food_service.listFoods().unwrap().size(), 1);
+  std::remove(path_to_temp_db.c_str());
 }
 
 TEST_F(FoodServiceTest, getOrFetchByBarcode) {
-    cc::clients::OpenFoodFactsClient client;
-    std::shared_ptr<cc::storage::JsonFoodRepository> repo_shared_ptr =
-        std::make_shared<cc::storage::JsonFoodRepository>(
-            "/home/anas/personal_projects/calorie-counter-backend/json_data_base_temp_.json");
-    std::shared_ptr<cc::clients::OpenFoodFactsClient> client_ptr =
-        std::make_shared<cc::clients::OpenFoodFactsClient>(client);
-    FoodService food_service{repo_shared_ptr, client_ptr};
-    food_service.clear_data_base();
-    std::string kefir_barcode("4025500287955");
-    // Fetch from online data base  because food doesn't exist locally
-    cc::utils::Result<cc::models::Food> kefir = food_service.getOrFetchByBarcode(kefir_barcode);
-    EXPECT_EQ(kefir.unwrap().id(), kefir_barcode);
+  cc::clients::OpenFoodFactsClient client;
+  std::shared_ptr<cc::storage::JsonFoodRepository> repo_shared_ptr =
+      std::make_shared<cc::storage::JsonFoodRepository>(path_to_temp_db);
+  std::shared_ptr<cc::clients::OpenFoodFactsClient> client_ptr =
+      std::make_shared<cc::clients::OpenFoodFactsClient>(client);
+  FoodService food_service{repo_shared_ptr, client_ptr};
+  food_service.clear_data_base();
+  std::string kefir_barcode("4025500287955");
+  // Fetch from online data base  because food doesn't exist locally
+  cc::utils::Result<cc::models::Food> kefir =
+      food_service.getOrFetchByBarcode(kefir_barcode);
+  EXPECT_EQ(kefir.unwrap().id(), kefir_barcode);
 
-    // Fetch from local data base because it is already saved to local data base
-    // food_service.addManualFood(kefir.unwrap());
-    cc::utils::Result<cc::models::Food> food = food_service.getOrFetchByBarcode(kefir_barcode);
-    EXPECT_EQ(food.unwrap().id(), kefir_barcode);
+  // Fetch from local data base because it is already saved to local data base
+  // food_service.addManualFood(kefir.unwrap());
+  cc::utils::Result<cc::models::Food> food =
+      food_service.getOrFetchByBarcode(kefir_barcode);
+  EXPECT_EQ(food.unwrap().id(), kefir_barcode);
 }
 
 TEST_F(FoodServiceTest, getOrFetchByBarcode_wrong_id) {
-    cc::clients::OpenFoodFactsClient client;
-    std::shared_ptr<cc::storage::JsonFoodRepository> repo_shared_ptr =
-        std::make_shared<cc::storage::JsonFoodRepository>(
-            "/home/anas/personal_projects/calorie-counter-backend/json_data_base_temp_.json");
-    std::shared_ptr<cc::clients::OpenFoodFactsClient> client_ptr =
-        std::make_shared<cc::clients::OpenFoodFactsClient>(client);
-    FoodService food_service{repo_shared_ptr, client_ptr};
-    food_service.clear_data_base();
-    std::string wrong_barcode("000000000000000");
-    cc::utils::Result<cc::models::Food> food = food_service.getOrFetchByBarcode(wrong_barcode);
-    EXPECT_EQ(food.unwrap_error().code, cc::utils::ErrorCode::NotFound);
-    // EXPECT_EQ(food.unwrap().id(),kefir_barcode);
+  cc::clients::OpenFoodFactsClient client;
+  std::shared_ptr<cc::storage::JsonFoodRepository> repo_shared_ptr =
+      std::make_shared<cc::storage::JsonFoodRepository>(path_to_temp_db);
+  std::shared_ptr<cc::clients::OpenFoodFactsClient> client_ptr =
+      std::make_shared<cc::clients::OpenFoodFactsClient>(client);
+  FoodService food_service{repo_shared_ptr, client_ptr};
+  food_service.clear_data_base();
+  std::string wrong_barcode("000000000000000");
+  cc::utils::Result<cc::models::Food> food =
+      food_service.getOrFetchByBarcode(wrong_barcode);
+  EXPECT_EQ(food.unwrap_error().code, cc::utils::ErrorCode::NotFound);
+  // EXPECT_EQ(food.unwrap().id(),kefir_barcode);
 }
 
 /*
 TEST_F(MealModelTest,setId) {
-    // std::chrono::system_clock::time_point tp = std::chrono::system_clock::now();
-    meal.setId("anas");
+    // std::chrono::system_clock::time_point tp =
+std::chrono::system_clock::now(); meal.setId("anas");
     EXPECT_EQ(meal.id(),"anas");
     }
 
@@ -315,7 +311,8 @@ TEST_F(MealModelTest,setFoodItems) {
     minina_2.setSource(SOURCE::Manual);
     minina_2.setImageUrl(std::string("https://example.com/granola.jpg"));
 
-    std::vector<std::pair<std::string, double>> food_items{{minina.id(),100},{minina_2.id(),50}};
+    std::vector<std::pair<std::string, double>>
+food_items{{minina.id(),100},{minina_2.id(),50}};
 
     meal.setFoodItems(food_items);
     EXPECT_EQ(meal.food_items()[0].first,minina.id());
@@ -327,8 +324,8 @@ TEST_F(MealModelTest,from_Json){
     nlohmann::json meal_json;
     meal_json["name"]="Breakfast";
     meal_json["id"]= "100";
-    std::vector<std::pair<std::string, double>> food_items{{"002",100},{"009",50}};
-    meal_json["foodItems"]=food_items;
+    std::vector<std::pair<std::string, double>>
+food_items{{"002",100},{"009",50}}; meal_json["foodItems"]=food_items;
     meal_json["tsUtc"]=cc::utils::toIso8601(std::chrono::system_clock::now());
     MealLog meal_lunch = meal_json;
     EXPECT_EQ(meal_json["name"].get<std::string>(),magic_enum::enum_name(meal_lunch.getName()));
@@ -341,8 +338,8 @@ TEST_F(MealModelTest,from_Json){
 TEST_F(MealModelTest,to_Json){
     meal.setName(MEALNAME::Breakfast);
     meal.setId("009900");
-    std::vector<std::pair<std::string, double>> food_items{{"002",100},{"009",50}};
-    meal.setFoodItems(food_items);
+    std::vector<std::pair<std::string, double>>
+food_items{{"002",100},{"009",50}}; meal.setFoodItems(food_items);
     meal.setTime(std::chrono::system_clock::now());
     ///////////////////////////////////
     nlohmann::json meal_json=meal;

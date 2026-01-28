@@ -2,7 +2,6 @@ import requests
 
 HOST = "http://127.0.0.1:18080"
 
-
 def test_root_returns_hello():
     r = requests.get(f"{HOST}/", timeout=1)
     assert r.status_code == 200
@@ -135,36 +134,48 @@ def test_put_updates_food_then_search_returns_updated():
     assert r3.status_code == 200
     assert "Rice UPDATED" in r3.text
 
-"""
 def test_delete_food_then_search_should_not_find_or_should_error():
     # Add
     add = {
-        "id": "t3",
+        "id": "003",
         "name": "Milk",
         "brand": "PytestBrand",
-        "barcode": "py_del_1",
+        "barcode": "003",
         "caloriePer100g": 60.0,
         "servingSizeG": 200.0,
+        "nutrient": [
+            {
+                "name": "protein",
+                "unit": "g",
+                "value": 3.4
+            },
+            {
+                "name": "carbohydrates",
+                "unit": "g",
+                "value": 4.1
+            },
+            {
+                "name": "fat",
+                "unit": "g",
+                "value": 1.5
+            }
+        ],
     }
     r = requests.post(f"{HOST}/foods", json=add, timeout=2)
     assert r.status_code == 200
 
     # Delete
-    r2 = requests.delete(f"{HOST}/foods?barcode=py_del_1", timeout=2)
+    r2 = requests.delete(f"{HOST}/foods?barcode=003", timeout=2)
     assert r2.status_code == 200
     assert r2.json()["status"] == "ok"
 
-    # After delete, expected behavior depends on your FoodService:
-    # - might return 404
-    # - might return other error
-    # - or might fetch from OpenFoodFacts (undesired in tests)
-    r3 = requests.get(f"{HOST}/search_by_barcode?barcode=py_del_1", timeout=2)
+    
+    r3 = requests.get(f"{HOST}/search_by_barcode?barcode=003", timeout=2)
 
-    # Accept "not found" outcomes without forcing a specific implementation:
+    # expected 500
     assert r3.status_code in (404, 400, 500, 200)
 
     # If it returns JSON error, check it exists
     if r3.headers.get("Content-Type", "").startswith("application/json") and r3.status_code != 200:
         j = r3.json()
         assert "error" in j
-        """

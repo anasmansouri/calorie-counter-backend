@@ -16,7 +16,8 @@ SERVER_BIN = os.path.join(PROJECT_ROOT, "build", "bin", "cc_app")
 
 HOST = "http://127.0.0.1:18080"
 
-
+env = os.environ.copy()
+env["CC_DB_PATH"] = "/tmp/cc_test_db.json"
 def _wait_until_ready(timeout_s: float = 8.0) -> None:
     t0 = time.time()
     last_err = None
@@ -47,7 +48,7 @@ def server_process():
     # env["CC_DB_PATH"] = "/tmp/cc_test_db.json"
 
     with open(log_path, "w") as out, open(err_path, "w") as err:
-        p = subprocess.Popen([SERVER_BIN], stdout=out, stderr=err)  # env=env if needed
+        p = subprocess.Popen([SERVER_BIN], stdout=out, stderr=err, env=env)  # env=env if needed
         try:
             _wait_until_ready()
             yield p
