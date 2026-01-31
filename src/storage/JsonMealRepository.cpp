@@ -1,9 +1,35 @@
 #include "storage/JsonMealRepository.hpp"
 #include "models/meal_log.hpp"
 #include "utils/date_time_utils.hpp"
+#include <algorithm>
 
 namespace cc::storage {
-JsonMealRepository::JsonMealRepository(std::string filePath) : filePath_{filePath} {}
+JsonMealRepository::JsonMealRepository(std::string filePath) : filePath_{filePath} {
+}
+
+
+cc::utils::Result<void> JsonMealRepository::sync_meals_id(){
+    int max_id=cc::models::MealLog::next_id_;
+    std::lock_guard<std::mutex> lock(this->mtx_);
+    std::ifstream infile(this->filePath_);
+    nlohmann::json file_content;
+    if (infile.is_open() && infile.peek() != std::ifstream::traits_type::eof()) {
+        infile >> file_content;
+        infile.close();
+        for (auto i : file_content) {
+            if(i.contains("id")){
+                max_id=std::max<int>(max_id,i["id"].get<int>());
+            }
+        }
+        cc::models::MealLog::next_id_=max_id;
+        return cc::utils::Result<void>::ok();
+    } else {
+        return cc::utils::Result<void>::fail(
+            cc::utils::ErrorCode::NotFound, "file is empty , or can't open that file");
+    }
+
+};
+
 cc::utils::Result<void> JsonMealRepository::save(const cc::models::MealLog& meal) {
     std::lock_guard<std::mutex> lock(this->mtx_);
     std::ifstream infile(filePath_);
@@ -27,7 +53,7 @@ cc::utils::Result<void> JsonMealRepository::save(const cc::models::MealLog& meal
     }
 }
 
-cc::utils::Result<cc::models::MealLog> JsonMealRepository::getById(const std::string& id) {
+cc::utils::Result<cc::models::MealLog> JsonMealRepository::getById(const int id) {
     std::lock_guard<std::mutex> lock(this->mtx_);
     std::ifstream infile(this->filePath_);
     nlohmann::json file_content;
@@ -35,7 +61,7 @@ cc::utils::Result<cc::models::MealLog> JsonMealRepository::getById(const std::st
         infile >> file_content;
         infile.close();
         for (auto i : file_content) {
-            if (i["id"].get<std::string>() == id) {
+            if (i["id"].get<int>() == id) {
                 cc::models::MealLog meal(i);
                 // i can do it otherwise because of the parse between json to meal  object.
                 // return cc::utils::Result<cc::models::MealLog>::ok(cc::models::MealLog(i));
@@ -71,7 +97,7 @@ cc::utils::Result<std::vector<cc::models::MealLog>> JsonMealRepository::list(int
             cc::utils::ErrorCode::NotFound, "file is empty , or can't open that file");
     }
 }
-cc::utils::Result<void> JsonMealRepository::remove(const std::string& id) {
+cc::utils::Result<void> JsonMealRepository::remove(const int id) {
 
     std::lock_guard<std::mutex> lock(this->mtx_);
     std::ifstream infile(this->filePath_);
@@ -80,7 +106,7 @@ cc::utils::Result<void> JsonMealRepository::remove(const std::string& id) {
         infile >> file_content;
         infile.close();
         for (int i = 0; i < file_content.size(); i++) {
-            if (file_content[i]["id"].get<std::string>() == id) {
+            if (file_content[i]["id"].get<int>() == id) {
                 file_content.erase(i);
                 std::ofstream o(this->filePath_);
                 if (o.is_open()) {
@@ -113,7 +139,7 @@ cc::utils::Result<void> JsonMealRepository::upsert(const cc::models::MealLog& me
         bool item_updated = false;
         for (int i = 0; i < file_content.size(); i++) {
             // pay attention to this comparison
-            if (file_content[i]["id"].get<std::string>() == meal.id()) {
+            if (file_content[i]["id"].get<int>() == meal.id()) {
                 file_content[i] = meal;
                 item_updated = true;
             }

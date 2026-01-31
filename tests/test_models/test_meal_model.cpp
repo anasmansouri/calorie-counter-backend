@@ -27,7 +27,9 @@ class MealModelTest : public ::testing::Test {
 
 TEST_F(MealModelTest, initializition) {
     MealLog lunch(MEALNAME::Lunch);
+    MealLog breakfast(MEALNAME::Breakfast);
     EXPECT_EQ(lunch.getName(), MEALNAME::Lunch);
+    EXPECT_EQ(breakfast.getName(), MEALNAME::Breakfast);
 }
 
 TEST_F(MealModelTest, setName) {
@@ -37,8 +39,8 @@ TEST_F(MealModelTest, setName) {
 
 TEST_F(MealModelTest, setId) {
     // std::chrono::system_clock::time_point tp = std::chrono::system_clock::now();
-    meal.setId("anas");
-    EXPECT_EQ(meal.id(), "anas");
+    meal.setId(1);
+    EXPECT_EQ(meal.id(), 1);
 }
 
 TEST_F(MealModelTest, addFoodItem) {
@@ -110,7 +112,7 @@ TEST_F(MealModelTest, setFoodItems) {
 TEST_F(MealModelTest, from_Json) {
     nlohmann::json meal_json;
     meal_json["name"] = "Breakfast";
-    meal_json["id"] = "100";
+    meal_json["id"] = 100;
     std::vector<std::pair<std::string, double>> food_items{{"002", 100}, {"009", 50}};
     meal_json["foodItems"] = food_items;
     meal_json["tsUtc"] = cc::utils::toIso8601(std::chrono::system_clock::now());
@@ -124,7 +126,7 @@ TEST_F(MealModelTest, from_Json) {
 
 TEST_F(MealModelTest, to_Json) {
     meal.setName(MEALNAME::Breakfast);
-    meal.setId("009900");
+    meal.setId(900);
     std::vector<std::pair<std::string, double>> food_items{{"002", 100}, {"009", 50}};
     meal.setFoodItems(food_items);
     meal.setTime(std::chrono::system_clock::now());
@@ -132,7 +134,7 @@ TEST_F(MealModelTest, to_Json) {
     nlohmann::json meal_json = meal;
     ///////////////////////////////////
     EXPECT_EQ(meal_json["name"].get<std::string>(), magic_enum::enum_name(meal.getName()));
-    EXPECT_EQ(meal_json["id"].get<std::string>(), meal.id());
+    EXPECT_EQ(meal_json["id"].get<int>(), meal.id());
     EXPECT_EQ(meal_json["foodItems"][0][0].get<std::string>(), meal.food_items()[0].first);
     EXPECT_EQ(meal_json["foodItems"][0][1].get<double>(), meal.food_items()[0].second);
     EXPECT_EQ(meal_json["tsUtc"].get<std::string>(), cc::utils::toIso8601(meal.gettime()));

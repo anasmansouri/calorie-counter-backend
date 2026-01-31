@@ -20,6 +20,7 @@ add_executable(cc_test_models
     test_models/test_food.cpp
     test_clients/test_OpenFoodFactsClient.cpp
     test_storage/test_JsonFoodRepository.cpp
+    test_storage/test_JsonMealRepository.cpp
     test_service/test_food_service.cpp
     )
 

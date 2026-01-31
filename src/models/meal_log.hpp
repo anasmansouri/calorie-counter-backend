@@ -6,6 +6,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <atomic>
 namespace cc::models {
 
 enum class MEALNAME { Breakfast, Lunch, Dinner, Snack }; // enum::MEALNAME
@@ -13,29 +14,32 @@ enum class MEALNAME { Breakfast, Lunch, Dinner, Snack }; // enum::MEALNAME
 class MealLog {
   private:
     std::chrono::system_clock::time_point tsUtc_;
-    std::string id_;
+    int  id_;
     MEALNAME name_{MEALNAME::Lunch};
     std::vector<std::pair<std::string, double>> food_items_; // foodId, grams
 
   public:
     // constructors
-    MealLog() = default;
+    MealLog();
     MealLog(MEALNAME mealName);
 
     // setters
     void setName(MEALNAME name);
-    void setId(std::string id);
     void setTime(std::chrono::system_clock::time_point tsUtc);
     void setFoodItems(std::vector<std::pair<std::string, double>> food_items);
-
+    void setId(int id);
     // getters
     MEALNAME getName() const;
-    std::string id() const;
+    int id() const;
     std::chrono::system_clock::time_point gettime() const;
     std::vector<std::pair<std::string, double>> food_items() const;
     // operations
     void addFoodItem(const std::string& foodId, double grams);
     bool removeFoodItem(const std::string& foodId);
+
+    //static variables 
+    inline static std::atomic<int>  next_id_{0};
+
 }; // MealLog
 inline void to_json(nlohmann::json& j, const cc::models::MealLog& m) {
     j = {{"name", magic_enum::enum_name(m.getName())},
@@ -54,7 +58,7 @@ inline void from_json(const nlohmann::json& j, cc::models::MealLog& m) {
     } else {
         m.setName(MEALNAME::Breakfast);
     }
-    m.setId(j.at("id").get<std::string>());
+    m.setId(j.at("id").get<int>());
     m.setTime(cc::utils::fromIso8601(j.at("tsUtc").get<std::string>()));
     m.setFoodItems(j.at("foodItems").get<std::vector<std::pair<std::string, double>>>());
 }

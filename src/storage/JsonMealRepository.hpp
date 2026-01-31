@@ -10,11 +10,13 @@ class JsonMealRepository : public MealRepository {
   public:
     explicit JsonMealRepository(std::string filePath);
 
+    // always run it once the repo starts
+    cc::utils::Result<void> sync_meals_id() override;
     cc::utils::Result<void> save(const cc::models::MealLog& meal) override;
-    cc::utils::Result<cc::models::MealLog> getById(const std::string& id) override;
+    cc::utils::Result<cc::models::MealLog> getById(int id) override;
     cc::utils::Result<std::vector<cc::models::MealLog>> list(int offset = 0,
                                                              int limit = 50) override;
-    cc::utils::Result<void> remove(const std::string& id) override;
+    cc::utils::Result<void> remove(int id) override;
 
     // update or insert if doesn't exist
     cc::utils::Result<void> upsert(const cc::models::MealLog& meal) override;

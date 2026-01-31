@@ -9,8 +9,10 @@
 #include <vector>
 
 namespace cc::models {
-
-MealLog::MealLog(MEALNAME name) : name_{name} {
+MealLog::MealLog() : name_{MEALNAME::Lunch},id_{++next_id_} {
+    this->tsUtc_ = std::chrono::system_clock::now();
+}
+MealLog::MealLog(MEALNAME name) : name_{name},id_{++next_id_} {
     this->tsUtc_ = std::chrono::system_clock::now();
 }
 MEALNAME MealLog::getName() const {
@@ -20,15 +22,14 @@ void MealLog::setName(MEALNAME name) {
     this->name_ = name;
 }
 
-std::string MealLog::id() const {
+int MealLog::id() const {
     return this->id_;
 }
-
 std::chrono::system_clock::time_point MealLog::gettime() const {
     return this->tsUtc_;
 }
 
-void MealLog::setId(std::string id) {
+void MealLog::setId(int id) {
     this->id_ = id;
 }
 

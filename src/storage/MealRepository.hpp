@@ -14,11 +14,13 @@ class MealRepository {
   public:
     virtual ~MealRepository() = default;
 
+
+    virtual cc::utils::Result<void> sync_meals_id() = 0;
     virtual cc::utils::Result<void> save(const cc::models::MealLog& meal) = 0;
-    virtual cc::utils::Result<cc::models::MealLog> getById(const std::string& id) = 0;
+    virtual cc::utils::Result<cc::models::MealLog> getById(int id) = 0;
     virtual cc::utils::Result<std::vector<cc::models::MealLog>> list(int offset = 0,
                                                                      int limit = 50) = 0;
-    virtual cc::utils::Result<void> remove(const std::string& id) = 0;
+    virtual cc::utils::Result<void> remove(int id) = 0;
 
     // optional:
     // update or insert if doesn't exist
