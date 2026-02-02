@@ -2,9 +2,14 @@
 #include "models/meal_log.hpp"
 #include "utils/date_time_utils.hpp"
 #include <algorithm>
+#include <bits/chrono.h>
+#include <cmath>
+#include <string>
+#include <string_view>
 
 namespace cc::storage {
 JsonMealRepository::JsonMealRepository(std::string filePath) : filePath_{filePath} {
+    this->sync_meals_id();
 }
 
 
@@ -75,6 +80,54 @@ cc::utils::Result<cc::models::MealLog> JsonMealRepository::getById(const int id)
                                                             "item not found");
     } else {
         return cc::utils::Result<cc::models::MealLog>::fail(
+            cc::utils::ErrorCode::NotFound, "file is empty , or can't open that file");
+    }
+}
+
+cc::utils::Result<std::vector<cc::models::MealLog>> JsonMealRepository::getByDate(std::chrono::system_clock::time_point tsUtc){
+
+    std::lock_guard<std::mutex> lock(this->mtx_);
+    std::ifstream infile(this->filePath_);
+    nlohmann::json file_content;
+    if (infile.is_open() && infile.peek() != std::ifstream::traits_type::eof()) {
+        infile >> file_content;
+        infile.close();
+        std::vector<cc::models::MealLog> meals_vector;
+        for (int i = 0; i < file_content.size(); i++) {
+            if(file_content[i].contains("tsUtc")){
+                if(floor<std::chrono::days>(cc::utils::fromIso8601(file_content[i]["tsUtc"].get<std::string>()))==floor<std::chrono::days>(tsUtc)){
+                     meals_vector.push_back(cc::models::MealLog(file_content[i]));
+                }
+            }
+        }
+        return cc::utils::Result<std::vector<cc::models::MealLog>>::ok(meals_vector);
+    } else {
+        return cc::utils::Result<std::vector<cc::models::MealLog>>::fail(
+            cc::utils::ErrorCode::NotFound, "file is empty , or can't open that file");
+    }
+
+}
+
+cc::utils::Result<std::vector<cc::models::MealLog>> JsonMealRepository::getByName(cc::models::MEALNAME name){
+
+    std::lock_guard<std::mutex> lock(this->mtx_);
+    std::ifstream infile(this->filePath_);
+    nlohmann::json file_content;
+    if (infile.is_open() && infile.peek() != std::ifstream::traits_type::eof()) {
+        infile >> file_content;
+        infile.close();
+        std::vector<cc::models::MealLog> meals_vector;
+        std::string_view searched_name = magic_enum::enum_name(name);
+        for (int i = 0; i < file_content.size(); i++) {
+            if(file_content[i].contains("name")){
+                if(file_content[i]["name"].get<std::string>()==searched_name){
+                    meals_vector.push_back(cc::models::MealLog(file_content[i]));
+                }
+            }
+        }
+        return cc::utils::Result<std::vector<cc::models::MealLog>>::ok(meals_vector);
+    } else {
+        return cc::utils::Result<std::vector<cc::models::MealLog>>::fail(
             cc::utils::ErrorCode::NotFound, "file is empty , or can't open that file");
     }
 }

@@ -22,6 +22,7 @@ add_executable(cc_test_models
     test_storage/test_JsonFoodRepository.cpp
     test_storage/test_JsonMealRepository.cpp
     test_service/test_food_service.cpp
+    test_service/test_meal_log_service.cpp
     )
 
 target_include_directories(cc_test_models

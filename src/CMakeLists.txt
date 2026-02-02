@@ -83,6 +83,7 @@ target_link_libraries(cc_storage PUBLIC cc_models cc_utils)
 # Services module
 add_library(cc_services
     services/FoodService.cpp services/FoodService.hpp
+    services/MealService.cpp services/MealService.hpp
     services/AuthService.cpp services/AuthService.hpp
     services/UserService.cpp services/UserService.hpp
 )

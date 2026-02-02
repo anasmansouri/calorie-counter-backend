@@ -10,10 +10,11 @@
 
 namespace cc::models {
 MealLog::MealLog() : name_{MEALNAME::Lunch},id_{++next_id_} {
-    this->tsUtc_ = std::chrono::system_clock::now();
+    this->tsUtc_ = std::chrono::floor<std::chrono::seconds>(std::chrono::system_clock::now());
 }
 MealLog::MealLog(MEALNAME name) : name_{name},id_{++next_id_} {
-    this->tsUtc_ = std::chrono::system_clock::now();
+    this->tsUtc_ = std::chrono::floor<std::chrono::seconds>(std::chrono::system_clock::now());
+
 }
 MEALNAME MealLog::getName() const {
     return this->name_;

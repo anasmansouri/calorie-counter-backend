@@ -48,7 +48,7 @@ cc::utils::Result<void> FoodService::updateFood(const cc::models::Food& food) {
         return cc::utils::Result<void>::ok();
     } else {
         return cc::utils::Result<void>::fail(cc::utils::ErrorCode::StorageError,
-                                             "can't add Manual Food");
+                                             "can't add  or update Food");
     }
 }
 cc::utils::Result<void> FoodService::deleteFood(const std::string& id) {

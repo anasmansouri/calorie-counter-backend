@@ -178,6 +178,33 @@ cc::utils::ErrorCode::NotFound);
     std::remove(path_to_meal_temp_db.c_str());
 }
 
+TEST_F(JsonMealRepositoryTest, getByName) {
+    JsonMealRepository repo_temp{path_to_meal_temp_db};
+
+    cc::models::MealLog lunch{cc::models::MEALNAME::Lunch};
+    repo_temp.clear();
+    EXPECT_NO_THROW(repo_temp.save(lunch));
+    cc::utils::Result<std::vector<cc::models::MealLog>> meal_list = repo_temp.getByName(cc::models::MEALNAME::Lunch);
+    EXPECT_EQ(meal_list.unwrap().size(), 1);
+    EXPECT_EQ(meal_list.unwrap()[0].id(), lunch.id());
+    EXPECT_EQ(meal_list.unwrap()[0].getName(), lunch.getName());
+    EXPECT_EQ(meal_list.unwrap()[0].gettime(), lunch.gettime());
+    std::remove(path_to_meal_temp_db.c_str());
+}
+
+TEST_F(JsonMealRepositoryTest, getByDate) {
+    JsonMealRepository repo_temp{path_to_meal_temp_db};
+
+    cc::models::MealLog lunch{cc::models::MEALNAME::Lunch};
+    repo_temp.clear();
+    EXPECT_NO_THROW(repo_temp.save(lunch));
+    cc::utils::Result<std::vector<cc::models::MealLog>> meal_list = repo_temp.getByDate(lunch.gettime());
+    EXPECT_EQ(meal_list.unwrap().size(), 1);
+    EXPECT_EQ(meal_list.unwrap()[0].id(), lunch.id());
+    EXPECT_EQ(meal_list.unwrap()[0].getName(), lunch.getName());
+    //EXPECT_EQ(meal_list.unwrap()[0].gettime(), lunch.gettime());
+    std::remove(path_to_meal_temp_db.c_str());
+}
 
 TEST_F(JsonMealRepositoryTest, list) {
     JsonMealRepository repo_temp{path_to_meal_temp_db};
@@ -191,20 +218,6 @@ repo_temp.list(); EXPECT_EQ(meal_list.unwrap().size(), 1);
     EXPECT_EQ(meal_list.unwrap()[0].food_items()[0].first, food.id());
     EXPECT_EQ(meal_list.unwrap()[0].food_items()[0].second,
 food.servingSizeG().value());
-
-
-    //EXPECT_EQ(food_list.unwrap()[0].barcode(), food.barcode());
-    //EXPECT_EQ(food_list.unwrap()[0].source(), food.source());
-    //EXPECT_EQ(food_list.unwrap()[0].imageUrl(), food.imageUrl());
-    //EXPECT_EQ(food_list.unwrap()[0].caloriesPer100g(),
-//food.caloriesPer100g());
-    //EXPECT_EQ(food_list.unwrap()[0].totalKcal(), food.totalKcal());
-    //EXPECT_EQ(food_list.unwrap()[0].to_string(), food.to_string());
-    //EXPECT_EQ(food_list.unwrap()[0].nutrients()[0].name(),
-//food.nutrients()[0].name());
-    //EXPECT_EQ(food_list.unwrap()[0].nutrients()[1].name(),
-//food.nutrients()[1].name());
-
     std::remove(path_to_meal_temp_db.c_str());
 }
 
