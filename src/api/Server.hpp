@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "services/FoodService.hpp"
+#include "services/MealService.hpp"
 #include "utils/Json_utils.hpp"
 #include <crow.h>
 
@@ -22,8 +23,8 @@ namespace cc::api {
 class Server {
   public:
     Server(int port,
-         std::shared_ptr<cc::services::FoodService> service /*,
-         std::shared_ptr<cc::services::AuthService> auth = nullptr*/);
+         std::shared_ptr<cc::services::FoodService> joodService ,
+         std::shared_ptr<cc::services::MealService> mealService);
     ~Server();
 
     void setupRoutes();
@@ -37,11 +38,11 @@ class Server {
     int port_;
     bool cors_ = false;
     std::shared_ptr<cc::services::FoodService> foodService_;
+    std::shared_ptr<cc::services::MealService> mealService_;
     std::mutex m_;
     std::condition_variable cv_;
     bool running_ = false;
     std::once_flag once;
-    // std::shared_ptr<cc::services::AuthService> auth_;
 };
 
 }

@@ -18,6 +18,7 @@ HOST = "http://127.0.0.1:18080"
 
 env = os.environ.copy()
 env["CC_DB_PATH"] = "/tmp/cc_test_db.json"
+env["CC_MEALS_DB_PATH"] = "/tmp/cc_UT_test_service_meal_db.json"
 def _wait_until_ready(timeout_s: float = 8.0) -> None:
     t0 = time.time()
     last_err = None

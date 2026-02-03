@@ -16,6 +16,7 @@
 namespace cc::utils {
 bool isBarCodeDigit(std::string_view s);
 std::string expand_user_path(const std::string &path);
-std::string default_db_path();
+std::string default_food_db_path();
+std::string default_meals_db_path();
 void ensure_db_file_exists(const std::string &db_path);
 } // namespace cc::utils

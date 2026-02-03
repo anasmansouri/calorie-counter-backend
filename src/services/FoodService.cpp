@@ -1,6 +1,8 @@
 #include "FoodService.hpp"
 #include "models/food.hpp"
 #include "utils/Result.hpp"
+#include <format>
+#include <string>
 #include <vector>
 
 namespace cc {
@@ -57,7 +59,7 @@ cc::utils::Result<void> FoodService::deleteFood(const std::string& id) {
         return cc::utils::Result<void>::ok();
     } else {
         return cc::utils::Result<void>::fail(cc::utils::ErrorCode::StorageError,
-                                             "can't  remove Food with id " + id);
+                                             std::format("can't  remove Food with id : {}",id));
     }
 }
 

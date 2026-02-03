@@ -1,12 +1,14 @@
 #include "MealService.hpp"
-#include "models/food.hpp"
-#include "models/meal_log.hpp"
-#include "storage/MealRepository.hpp"
-#include "utils/Result.hpp"
+
 #include <chrono>
 #include <magic_enum.hpp>
 #include <optional>
 #include <vector>
+
+#include "models/food.hpp"
+#include "models/meal_log.hpp"
+#include "storage/MealRepository.hpp"
+#include "utils/Result.hpp"
 
 namespace cc {
 namespace services {
@@ -16,24 +18,9 @@ MealService::MealService(std::shared_ptr<cc::storage::MealRepository> repo)
 
 {}
 
-/*
-cc::utils::Result<cc::models::Food> FoodService::getOrFetchByBarcode(const
-std::string& bardcode) { cc::utils::Result<cc::models::Food> f; f =
-this->repo_->getById_or_Barcode(bardcode); if (f) { return f; } else { f =
-this->off_->getByBarcode(bardcode); if (f) {
-            // save food in data base so next time will be available no need to
-look online this->repo_->save(f.unwrap()); return f;
-        }
-    }
-    return
-cc::utils::Result<cc::models::Food>::fail(cc::utils::ErrorCode::NotFound, "Food
-not found");
-}
-*/
-
 // #todo zed der les cas , bach thkam l program
-cc::utils::Result<void>
-MealService::addNewMeal(const cc::models::MealLog &meal) {
+cc::utils::Result<void> MealService::addNewMeal(
+    const cc::models::MealLog& meal) {
   cc::utils::Result<void> result = this->repo_->save(meal);
   // if true food is saved correctly
   if (result) {
@@ -44,8 +31,8 @@ MealService::addNewMeal(const cc::models::MealLog &meal) {
   }
 }
 
-cc::utils::Result<std::vector<cc::models::MealLog>>
-MealService::getByName(const std::string &name) {
+cc::utils::Result<std::vector<cc::models::MealLog>> MealService::getByName(
+    const std::string& name) {
   std::optional<cc::models::MEALNAME> optional_name =
       magic_enum::enum_cast<cc::models::MEALNAME>(name);
   cc::models::MEALNAME searched_meal_name;
@@ -65,9 +52,8 @@ MealService::getByName(const std::string &name) {
   }
 }
 
-cc::utils::Result<std::vector<cc::models::MealLog>>
-MealService::getByDate(int day, int month, int year) {
-
+cc::utils::Result<std::vector<cc::models::MealLog>> MealService::getByDate(
+    int day, int month, int year) {
   std::chrono::year y{year};
   std::chrono::month m{static_cast<unsigned>(month)};
   std::chrono::day d{static_cast<unsigned>(day)};
@@ -89,8 +75,8 @@ MealService::getByDate(int day, int month, int year) {
   }
 }
 
-cc::utils::Result<void>
-MealService::updateMeal(const cc::models::MealLog &meal) {
+cc::utils::Result<void> MealService::updateMeal(
+    const cc::models::MealLog& meal) {
   cc::utils::Result<void> result = this->repo_->upsert(meal);
   // if true food is saved correctly
   if (result) {
@@ -112,7 +98,6 @@ cc::utils::Result<void> MealService::deleteMeal(int id) {
 }
 
 cc::utils::Result<void> MealService::clear_data_base() {
-
   cc::utils::Result<void> result = this->repo_->clear();
   if (result) {
     return cc::utils::Result<void>::ok();
@@ -122,8 +107,8 @@ cc::utils::Result<void> MealService::clear_data_base() {
   }
 }
 
-cc::utils::Result<std::vector<cc::models::MealLog>>
-MealService::listMeals(int offset, int limit) {
+cc::utils::Result<std::vector<cc::models::MealLog>> MealService::listMeals(
+    int offset, int limit) {
   cc::utils::Result<std::vector<cc::models::MealLog>> result =
       this->repo_->list(offset, limit);
   if (result) {
@@ -134,5 +119,5 @@ MealService::listMeals(int offset, int limit) {
   }
 }
 
-} // namespace services
-} // namespace cc
+}  // namespace services
+}  // namespace cc

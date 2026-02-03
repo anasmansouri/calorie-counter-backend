@@ -17,7 +17,17 @@ std::string expand_user_path(const std::string &path) {
   return std::string(home) + path.substr(1); // replace leading '~'
 }
 
-std::string default_db_path() {
+std::string  default_meals_db_path(){
+  // Prefer XDG_DATA_HOME if available
+  const char *xdg = std::getenv("XDG_DATA_HOME");
+  if (xdg && std::string(xdg).size() > 0) {
+    return std::string(xdg) + "/calorie-counter/json_meals_data_base.json";
+  }
+
+  // Fallback to ~/.local/share
+  return expand_user_path("~/.local/share/calorie-counter/json_meals_data_base.json");
+} 
+std::string default_food_db_path() {
   // Prefer XDG_DATA_HOME if available
   const char *xdg = std::getenv("XDG_DATA_HOME");
   if (xdg && std::string(xdg).size() > 0) {

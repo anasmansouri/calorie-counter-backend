@@ -66,7 +66,7 @@ JsonFoodRepository::list(int offset, int limit) {
     infile >> file_content;
     infile.close();
     std::vector<cc::models::Food> food_vector;
-    for (int i = offset; i < file_content.size() && i <= limit; i++) {
+    for (int i = offset; i < file_content.size() && i < offset+limit; i++) {
       food_vector.push_back(cc::models::Food(file_content[i]));
     }
     return cc::utils::Result<std::vector<cc::models::Food>>::ok(food_vector);
