@@ -52,6 +52,18 @@ cc::utils::Result<std::vector<cc::models::MealLog>> MealService::getByName(
   }
 }
 
+cc::utils::Result<cc::models::MealLog> MealService::getById(
+    int id) {
+  cc::utils::Result<cc::models::MealLog> meal =
+      this->repo_->getById(id);
+  if (meal) {
+    return meal;
+  } else {
+    return cc::utils::Result<cc::models::MealLog>::fail(
+        cc::utils::ErrorCode::NotFound, "no item was found ");
+  }
+}
+
 cc::utils::Result<std::vector<cc::models::MealLog>> MealService::getByDate(
     int day, int month, int year) {
   std::chrono::year y{year};

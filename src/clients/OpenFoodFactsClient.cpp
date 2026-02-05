@@ -149,7 +149,7 @@ cc::utils::Result<cc::models::Food> OpenFoodFactsClient::parseFoodFromOffJson_ba
 
             if (nutriments.contains("proteins") && !nutriments["proteins"].is_null()) {
                 models::Nutrient p;
-                p.setName("protein");
+                p.setType(cc::models::NutrientType::Protein);
                 p.setUnit(nutriments.at("proteins_unit").get<std::string>());
                 p.setValue(nutriments.at("proteins_100g").get<double>());
                 ns.push_back(p);
@@ -158,7 +158,7 @@ cc::utils::Result<cc::models::Food> OpenFoodFactsClient::parseFoodFromOffJson_ba
             // carbs
             if (nutriments.contains("carbohydrates") && !nutriments["carbohydrates"].is_null()) {
                 models::Nutrient carbs;
-                carbs.setName("carbohydrates");
+                carbs.setType(cc::models::NutrientType::Carbs);
                 carbs.setUnit(nutriments.at("carbohydrates_unit"));
                 carbs.setValue(nutriments.at("carbohydrates_100g"));
                 ns.push_back(carbs);
@@ -167,12 +167,11 @@ cc::utils::Result<cc::models::Food> OpenFoodFactsClient::parseFoodFromOffJson_ba
             //  fat
             if (nutriments.contains("fat") && !nutriments["fat"].is_null()) {
                 models::Nutrient fat;
-                fat.setName("fat");
+                fat.setType(cc::models::NutrientType::Fat);
                 fat.setUnit(nutriments.at("fat_unit"));
                 fat.setValue(nutriments.at("fat_100g"));
                 ns.push_back(fat);
             }
-
             food_item.setNutrients(ns);
         }
         return cc::utils::Result<cc::models::Food>::ok(std::move(food_item));

@@ -23,6 +23,8 @@ public:
   getByName(const std::string &name);
   cc::utils::Result<std::vector<cc::models::MealLog>>
   getByDate(int day, int month, int year);
+  cc::utils::Result<cc::models::MealLog>
+  getById(int id);
   cc::utils::Result<void> addNewMeal(const cc::models::MealLog &meal);
   cc::utils::Result<void> updateMeal(const cc::models::MealLog &meal);
   cc::utils::Result<void> deleteMeal(int id);

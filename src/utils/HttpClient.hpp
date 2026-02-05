@@ -18,7 +18,7 @@ class HttpClient {
     void setUserAgents(const std::string& ua);
 
   private:
-    int timeoutMs_ = 10000;
+    int timeoutMs_ = 20000;
     std::string userAgent_ = "CalorieCounter/1.0 (+https://example.com; anas@example.com)";
 };
 

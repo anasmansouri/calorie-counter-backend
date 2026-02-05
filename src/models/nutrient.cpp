@@ -1,22 +1,22 @@
 #pragma once
 #include "models/nutrient.hpp"
+#include "magic_enum.hpp"
 #include <iostream>
 #include <string>
 
 namespace cc {
 namespace models {
 
-Nutrient::Nutrient(std::string name, double value, std::string unit)
-    : name_{name}, value_{value}, unit_{unit} {
-    std::cout << "Nutrient " << name << " is created" << std::endl;
+Nutrient::Nutrient(NutrientType type, double value, std::string unit)
+    : type_{type}, value_{value}, unit_{unit} {
 }
 
 // Name
-const std::string& Nutrient::name() const {
-    return this->name_;
+const NutrientType& Nutrient::type() const {
+    return this->type_;
 }
-void Nutrient::setName(std::string n) {
-    this->name_ = n;
+void Nutrient::setType(NutrientType type) {
+    this->type_ = type;
 }
 
 // value
@@ -37,7 +37,7 @@ void Nutrient::setUnit(std::string u) {
 }
 
 std::string Nutrient::to_string() const {
-    return std::format("{} : {} : {}", this->name_, this->value_, this->unit_);
+    return std::format("{} : {} : {}", magic_enum::enum_name(this->type_), this->value_, this->unit_);
 }
 } // namespace models
 } // namespace cc

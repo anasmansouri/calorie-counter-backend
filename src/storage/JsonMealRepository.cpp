@@ -74,12 +74,6 @@ cc::utils::Result<cc::models::MealLog> JsonMealRepository::getById(
     for (auto i : file_content) {
       if (i["id"].get<int>() == id) {
         cc::models::MealLog meal(i);
-        // i can do it otherwise because of the parse between json to meal
-        // object. return
-        // cc::utils::Result<cc::models::MealLog>::ok(cc::models::MealLog(i));
-        // meal.setId(i["id"].get<std::string>());
-        // meal.setName(i["name"].get<cc::models::MEALNAME>());
-        // meal = i;
         return cc::utils::Result<cc::models::MealLog>::ok(meal);
       }
     }

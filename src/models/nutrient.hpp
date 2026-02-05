@@ -3,24 +3,26 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <string>
+#include <magic_enum.hpp>
 namespace cc::models {
 
+enum class NutrientType{Protein,Carbs,Fat,Unknown};
 class Nutrient {
   private:
-    std::string name_;      // Protein , Carbs , Fat
+    NutrientType type_;      // Protein , Carbs , Fat
     double value_{0.0};     // per 100g basis
     std::string unit_{"g"}; // eg. "g", "mg"
 
   public:
     // constructors
-    Nutrient(std::string name, double value, std::string unit = "g");
+    Nutrient(NutrientType type, double value, std::string unit = "g");
     Nutrient() = default;
     // getters
-    const std::string& name() const;
+    const NutrientType& type() const;
     const std::string& unit() const;
     double value() const;
     // setters
-    void setName(std::string n);
+    void setType(NutrientType type);
     void setValue(double v);
     void setUnit(std::string u);
     // to string
@@ -29,10 +31,14 @@ class Nutrient {
 }; // Nutrient
    // Nutrient serializer
 inline void to_json(nlohmann::json& j, const cc::models::Nutrient& n) {
-    j = {{"name", n.name()}, {"value", n.value()}, {"unit", n.unit()}};
+    j = {{"type", magic_enum::enum_name(n.type())}, {"value", n.value()}, {"unit", n.unit()}};
 }
 inline void from_json(const nlohmann::json& j, cc::models::Nutrient& n) {
-    n.setName(j.at("name").get<std::string>());
+    if(j.contains("type")&&!j.at("type").is_null()){
+        n.setType(magic_enum::enum_cast<NutrientType>(j.at("type").get<std::string>()).value_or(NutrientType::Unknown));
+    }else{
+        n.setType(NutrientType::Unknown);
+    }
     n.setValue(j.at("value").get<double>());
     n.setUnit(j.at("unit").get<std::string>());
 }

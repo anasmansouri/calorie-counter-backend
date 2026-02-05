@@ -97,7 +97,7 @@ void Food::setSource(SOURCE s) {
 
 // totalKcal
 double Food::totalKcal() const {
-    return (this->servingSizeG_.value()) * (this->caloriesPer100g_);
+    return (this->servingSizeG_.value()) * (this->caloriesPer100g_)/100;
 }
 } // namespace models
 } // namespace cc

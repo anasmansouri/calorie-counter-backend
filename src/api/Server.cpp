@@ -8,6 +8,7 @@
 
 #include <cstdlib>
 #include <exception>
+#include <format>
 #include <iostream>
 #include <magic_enum.hpp>
 #include <mutex>
@@ -17,6 +18,7 @@
 #include <vector>
 
 #include "models/food.hpp"
+#include "models/meal_log.hpp"
 #include "models/nutrient.hpp"
 #include "nlohmann/json.hpp"
 #include "utils/Result.hpp"
@@ -29,6 +31,71 @@ Server::Server(int port, std::shared_ptr<cc::services::FoodService> foodService,
                std::shared_ptr<cc::services::MealService> mealService)
     : port_{port}, foodService_{foodService}, mealService_{mealService} {}
 Server::~Server() { this->stop(); }
+
+cc::utils::Result<void> Server::calculateCalories(
+    nlohmann::json& meal) {
+  double totalKcal;
+  for (auto food_dic : meal.at("foodItems")) {
+    cc::utils::Result<cc::models::Food> food_result =
+        this->foodService_->getOrFetchByBarcode(food_dic[0].get<std::string>());
+    if (food_result) {
+      cc::models::Food food = food_result.unwrap();
+      // #todo
+      // remove serving_size from food , i want to give it as a parameter to
+      // totalKcal function .
+      food.setServingSizeG(food_dic[1].get<double>());
+      totalKcal += food.totalKcal();
+    } else {
+      return cc::utils::Result<void>::fail(food_result.unwrap_error().code,
+                                           food_result.unwrap_error().message);
+    }
+  }
+  meal["calories"] = totalKcal;
+  return cc::utils::Result<void>::ok();
+}
+cc::utils::Result<void> Server::attachMacros_to_one_meal(nlohmann::json& meal) {
+  int protein_quantity_in_gram = 0;
+  int carbs_quantity_in_gram = 0;
+  int fat_quantity_in_gram = 0;
+  for (auto food_dic : meal.at("foodItems")) {
+    cc::utils::Result<cc::models::Food> food_result =
+        this->foodService_->getOrFetchByBarcode(food_dic[0].get<std::string>());
+    if (food_result) {
+      cc::models::Food food = food_result.unwrap();
+
+      for (cc::models::Nutrient n : food.nutrients()) {
+        if (n.type() == cc::models::NutrientType::Protein) {
+          protein_quantity_in_gram += n.value();
+        } else if (n.type() == cc::models::NutrientType::Carbs) {
+          carbs_quantity_in_gram += n.value();
+        } else if (n.type() == cc::models::NutrientType::Fat) {
+          fat_quantity_in_gram += n.value();
+        }
+      }
+
+    } else {
+      std::cout << std::format("can't add macros") << std::endl;
+      return cc::utils::Result<void>::fail(food_result.unwrap_error().code,
+                                           food_result.unwrap_error().message);
+    }
+  }
+  meal[magic_enum::enum_name(cc::models::NutrientType::Protein)] =
+      protein_quantity_in_gram;
+  meal[magic_enum::enum_name(cc::models::NutrientType::Carbs)] =
+      carbs_quantity_in_gram;
+  meal[magic_enum::enum_name(cc::models::NutrientType::Fat)] =
+      fat_quantity_in_gram;
+  return cc::utils::Result<void>::ok();
+}
+
+cc::utils::Result<void> Server::attachMacros_to_meals(nlohmann::json& meals) {
+  for (auto& meal : meals) {
+    attachMacros_to_one_meal(meal);
+  }
+
+  return cc::utils::Result<void>::ok();
+}
+
 void Server::setupRoutes() {
   CROW_ROUTE(this->app, "/").methods(crow::HTTPMethod::Get)([]() {
     return "Hello, Crow!";
@@ -127,7 +194,12 @@ void Server::setupRoutes() {
           for (const auto& n : body["nutrient"]) {
             // Convert Crow json node -> string -> nlohmann::json -> Nutrient
             cc::models::Nutrient nutrient;
-            nutrient.setName(n["name"].s());
+            const std::string nutrient_typestr = n["type"].s();
+            auto nutrient_type =
+                magic_enum::enum_cast<cc::models::NutrientType>(
+                    nutrient_typestr);
+            nutrient.setType(
+                nutrient_type.value_or(cc::models::NutrientType::Unknown));
             nutrient.setUnit(n["unit"].s());
             nutrient.setValue(n["value"].d());
             nutrients.push_back(nutrient);
@@ -170,7 +242,12 @@ void Server::setupRoutes() {
           for (const auto& n : body["nutrient"]) {
             // Convert Crow json node -> string -> nlohmann::json -> Nutrient
             cc::models::Nutrient nutrient;
-            nutrient.setName(n["name"].s());
+            const std::string nutrient_typestr = n["type"].s();
+            auto nutrient_type =
+                magic_enum::enum_cast<cc::models::NutrientType>(
+                    nutrient_typestr);
+            nutrient.setType(
+                nutrient_type.value_or(cc::models::NutrientType::Unknown));
             nutrient.setUnit(n["unit"].s());
             nutrient.setValue(n["value"].d());
             nutrients.push_back(nutrient);
@@ -208,6 +285,12 @@ void Server::setupRoutes() {
         crow::json::wvalue response_json;
         if (res) {
           nlohmann::json j = res.unwrap();  // vector<MealLog> -> json (to_json)
+          if (!j.empty()) {
+            for (auto& item : j) {
+              this->calculateCalories(item);
+            }
+            attachMacros_to_meals(j);
+          }
           response_json = cc::utils::to_crow_json(j);
           return crow::response(200, response_json);
         } else {
@@ -219,8 +302,6 @@ void Server::setupRoutes() {
         }
       });
 
- 
-  
   // GET /meals/by_name?name=Lunch
   CROW_ROUTE(this->app, "/meals/by_name")
       .methods(crow::HTTPMethod::GET)([this](const crow::request& req) {
@@ -236,6 +317,12 @@ void Server::setupRoutes() {
 
         if (res) {
           nlohmann::json j = res.unwrap();
+          if (!j.empty()) {
+            for (auto& item : j) {
+              this->calculateCalories(item);
+            }
+          attachMacros_to_meals(j);
+          }
           response_json = cc::utils::to_crow_json(j);
           return crow::response(200, response_json);
         } else {
@@ -247,7 +334,35 @@ void Server::setupRoutes() {
         }
       });
 
-  
+  // GET /meals/by_id?id=0611387988456
+  CROW_ROUTE(this->app, "/meals/by_id")
+      .methods(crow::HTTPMethod::GET)([this](const crow::request& req) {
+        auto id = req.url_params.get("id");
+        crow::json::wvalue response_json;
+
+        if (id == nullptr || std::string(id).empty()) {
+          response_json["error"] = "missing id";
+          return crow::response(400, response_json);
+        }
+        int meal_id = atoi(id);
+
+        auto res = this->mealService_->getById(meal_id);
+
+        if (res) {
+          nlohmann::json j = res.unwrap();
+          attachMacros_to_one_meal(j);
+          this->calculateCalories(j);
+          response_json = cc::utils::to_crow_json(j);
+          return crow::response(200, response_json);
+        } else {
+          response_json["error"] = res.unwrap_error().message;
+          return crow::response(
+              cc::utils::convert_error_code_into_HTTP_Responses(
+                  res.unwrap_error().code),
+              response_json);
+        }
+      });
+
   // GET /meals/by_date?day=2&month=2&year=2026
   CROW_ROUTE(this->app, "/meals/by_date")
       .methods(crow::HTTPMethod::GET)([this](const crow::request& req) {
@@ -270,6 +385,12 @@ void Server::setupRoutes() {
 
         if (res) {
           nlohmann::json j = res.unwrap();
+          if (!j.empty()) {
+            for (auto& item : j) {
+              this->calculateCalories(item);
+            }
+          attachMacros_to_meals(j);
+          }
           response_json = cc::utils::to_crow_json(j);
           return crow::response(200, response_json);
         } else {
@@ -338,7 +459,6 @@ void Server::setupRoutes() {
               response_json);
         }
       });
-  
 
   // PUT /meals  (update)
   // Body example:
@@ -373,8 +493,8 @@ void Server::setupRoutes() {
 
         if (body.has("foodItems")) {
           std::vector<std::pair<std::string, double>> items;
-          for(auto item : body["foodItems"]){
-            items.push_back({item[0].s(),item[1].d()});
+          for (auto item : body["foodItems"]) {
+            items.push_back({item[0].s(), item[1].d()});
           }
           meal.setFoodItems(items);
         }
@@ -393,7 +513,7 @@ void Server::setupRoutes() {
               response_json);
         }
       });
-  
+
   // DELETE /meals?id=10
   CROW_ROUTE(this->app, "/meals")
       .methods(crow::HTTPMethod::DELETE)([this](const crow::request& req) {
@@ -437,7 +557,6 @@ void Server::setupRoutes() {
               response_json);
         }
       });
-  
 
   ///////////////////////Meals//////////////////////////
 }
