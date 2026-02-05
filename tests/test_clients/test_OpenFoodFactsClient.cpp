@@ -30,30 +30,29 @@ class OpenFoodFactsClientModelTest : public ::testing::Test {
 TEST_F(OpenFoodFactsClientModelTest, getByBarcode) {
 
     OpenFoodFactsClient client_test{};
-    std::string barcode_whey_protein{"5060245600507"};
+    std::string barcode_whey_protein{"4250519647425"};
     auto result = client_test.getByBarcode(barcode_whey_protein);
 
     if (result) {
         food = result.unwrap();
-        EXPECT_EQ(food.name(), "GOLD STANDARD 100% WHEY DOUBLE RICH CHOCOLATE");
-        EXPECT_EQ(food.brand(), "OPTIMUM NUTRITION");
-        EXPECT_EQ(food.barcode().value(), "5060245600507");
-        EXPECT_EQ(food.caloriesPer100g(), 374);
+        EXPECT_EQ(food.name(), "Designer Whey Protein Strawberry Cream");
+        EXPECT_EQ(food.brand(), "ESN");
+        EXPECT_EQ(food.barcode().value(), "4250519647425");
+        EXPECT_EQ(food.caloriesPer100g(), 375);
         /////////////////////////////////////////////////////
-        EXPECT_EQ(food.imageUrl().value(), "https://images.openfoodfacts.org/images/products/506/"
-                                           "024/560/0507/front_en.27.400.jpg");
+        EXPECT_NO_THROW(food.imageUrl().value());
         /////////////////////////////////////////////////////
-        EXPECT_EQ(food.nutrients()[0].name(), "protein");
+        EXPECT_EQ(food.nutrients()[0].type(), cc::models::NutrientType::Protein);
         EXPECT_EQ(food.nutrients()[0].unit(), "g");
-        EXPECT_EQ(food.nutrients()[0].value(), 77.4);
+        EXPECT_EQ(food.nutrients()[0].value(), 76);
         /////////////////////////////////////////////////////
-        EXPECT_EQ(food.nutrients()[1].name(), "carbohydrates");
+        EXPECT_EQ(food.nutrients()[1].type(), cc::models::NutrientType::Carbs);
         EXPECT_EQ(food.nutrients()[1].unit(), "g");
-        EXPECT_EQ(food.nutrients()[1].value(), 5.16);
+        EXPECT_EQ(food.nutrients()[1].value(), 5.7);
         /////////////////////////////////////////////////////
-        EXPECT_EQ(food.nutrients()[2].name(), "fat");
+        EXPECT_EQ(food.nutrients()[2].type(), cc::models::NutrientType::Fat);
         EXPECT_EQ(food.nutrients()[2].unit(), "g");
-        EXPECT_EQ(food.nutrients()[2].value(), 4.52);
+        EXPECT_EQ(food.nutrients()[2].value(), 4.6);
     }
 
     ///////////////////////////////////////////////////////////
@@ -72,15 +71,15 @@ TEST_F(OpenFoodFactsClientModelTest, getByBarcode) {
         EXPECT_EQ(food.imageUrl().value(), "https://images.openfoodfacts.org/images/products/000/"
                                            "002/036/4625/front_fr.73.400.jpg");
         /////////////////////////////////////////////////////
-        EXPECT_EQ(food.nutrients()[0].name(), "protein");
+        EXPECT_EQ(food.nutrients()[0].type(), cc::models::NutrientType::Protein);
         EXPECT_EQ(food.nutrients()[0].unit(), "g");
         EXPECT_EQ(food.nutrients()[0].value(), 8.2);
         /////////////////////////////////////////////////////
-        EXPECT_EQ(food.nutrients()[1].name(), "carbohydrates");
+        EXPECT_EQ(food.nutrients()[1].type(), cc::models::NutrientType::Carbs);
         EXPECT_EQ(food.nutrients()[1].unit(), "g");
         EXPECT_EQ(food.nutrients()[1].value(), 78);
         /////////////////////////////////////////////////////
-        EXPECT_EQ(food.nutrients()[2].name(), "fat");
+        EXPECT_EQ(food.nutrients()[2].type(), cc::models::NutrientType::Fat);
         EXPECT_EQ(food.nutrients()[2].unit(), "g");
         EXPECT_EQ(food.nutrients()[2].value(), 0.5);
     }

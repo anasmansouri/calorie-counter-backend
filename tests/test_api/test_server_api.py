@@ -60,17 +60,17 @@ def test_post_food_then_list_contains_it():
         "servingSizeG": 40.0,
         "nutrient": [
             {
-                "name": "protein",
+                "type": "Protein",
                 "unit": "g",
                 "value": 3.4
             },
             {
-                "name": "carbohydrates",
+                "type": "Carbs",
                 "unit": "g",
                 "value": 4.1
             },
             {
-                "name": "fat",
+                "type": "Fat",
                 "unit": "g",
                 "value": 1.5
             }
@@ -102,17 +102,17 @@ def test_put_updates_food_then_search_returns_updated():
         "servingSizeG": 40.0,
         "nutrient": [
             {
-                "name": "protein",
+                "type": "Protein",
                 "unit": "g",
                 "value": 3.4
             },
             {
-                "name": "carbohydrates",
+                "type": "Carbs",
                 "unit": "g",
                 "value": 4.1
             },
             {
-                "name": "fat",
+                "type": "Fat",
                 "unit": "g",
                 "value": 1.5
             }
@@ -147,17 +147,17 @@ def test_delete_food_then_search_should_not_find_or_should_error():
         "servingSizeG": 200.0,
         "nutrient": [
             {
-                "name": "protein",
+                "type": "Protein",
                 "unit": "g",
                 "value": 3.4
             },
             {
-                "name": "carbohydrates",
+                "type": "Carbs",
                 "unit": "g",
                 "value": 4.1
             },
             {
-                "name": "fat",
+                "type": "Fat",
                 "unit": "g",
                 "value": 1.5
             }

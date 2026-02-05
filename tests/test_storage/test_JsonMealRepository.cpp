@@ -27,11 +27,10 @@ protected:
   food.setBrand(std::string("wlad 3icha l3arbi"));
   food.setBarcode(std::string("2131654967498"));
   food.setCaloriesPer100g(420.0);
-  food.setServingSizeG(40.0); // default serving size 40g
   food.setSource(cc::models::SOURCE::Manual);
   food.setImageUrl(std::string("https://example.com/granola.jpg"));
   ///////////////////////
-  meal.addFoodItem(food.id(), food.servingSizeG().value());
+  meal.addFoodItem(food.id(), 100);
   
   }
 
@@ -69,12 +68,11 @@ TEST_F(JsonMealRepositoryTest, save_and_data_base_empty) {
   food.setBrand(std::string("wlad 3icha l3arbi"));
   food.setBarcode(std::string("2131654967498"));
   food.setCaloriesPer100g(420.0);
-  food.setServingSizeG(40.0); // default serving size 40g
   food.setSource(cc::models::SOURCE::Manual);
   food.setImageUrl(std::string("https://example.com/granola.jpg"));
   ///////////////////////
-  breakfast.addFoodItem(food.id(), food.servingSizeG().value());
-  lunch.addFoodItem(food.id(), food.servingSizeG().value());
+  breakfast.addFoodItem(food.id(), 100);
+  lunch.addFoodItem(food.id(), 100);
   ////////////////////////////////
 
   EXPECT_NO_THROW(repo_temp.save(breakfast));
@@ -87,7 +85,7 @@ TEST_F(JsonMealRepositoryTest, save_and_data_base_empty) {
   EXPECT_EQ(repo_temp.getById(breakfast.id()).unwrap().food_items()[0].first,
             food.id());
   EXPECT_EQ(repo_temp.getById(breakfast.id()).unwrap().food_items()[0].second,
-            food.servingSizeG().value());
+           100);
 
   EXPECT_NO_THROW(repo_temp.save(lunch));
   std::remove("/home/anas/personal_projects/calorie-counter-backend/json_data_base_meals_im_testing_meals_id.json");
@@ -117,12 +115,11 @@ TEST_F(JsonMealRepositoryTest, test_sync_meals_id) {
   food.setBrand(std::string("wlad 3icha l3arbi"));
   food.setBarcode(std::string("2131654967498"));
   food.setCaloriesPer100g(420.0);
-  food.setServingSizeG(40.0); // default serving size 40g
   food.setSource(cc::models::SOURCE::Manual);
   food.setImageUrl(std::string("https://example.com/granola.jpg"));
   ///////////////////////
-  breakfast.addFoodItem(food.id(), food.servingSizeG().value());
-  lunch.addFoodItem(food.id(), food.servingSizeG().value());
+  breakfast.addFoodItem(food.id(), 100);
+  lunch.addFoodItem(food.id(), 100);
   ////////////////////////////////
 
   EXPECT_NE(breakfast.id(), lunch.id());
@@ -165,7 +162,7 @@ TEST_F(JsonMealRepositoryTest, getById) {
     EXPECT_EQ(repo_temp.getById(meal.id()).unwrap().gettime(), meal.gettime());
     EXPECT_EQ(repo_temp.getById(meal.id()).unwrap().food_items()[0].first,
 food.id()); EXPECT_EQ(repo_temp.getById(meal.id()).unwrap().food_items()[0].second,
-food.servingSizeG().value());
+100);
     std::remove(path_to_meal_temp_db.c_str());
 }
 
@@ -217,7 +214,7 @@ repo_temp.list(); EXPECT_EQ(meal_list.unwrap().size(), 1);
 
     EXPECT_EQ(meal_list.unwrap()[0].food_items()[0].first, food.id());
     EXPECT_EQ(meal_list.unwrap()[0].food_items()[0].second,
-food.servingSizeG().value());
+100);
     std::remove(path_to_meal_temp_db.c_str());
 }
 

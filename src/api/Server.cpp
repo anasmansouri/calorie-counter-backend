@@ -1,5 +1,6 @@
 #include "Server.hpp"
 
+#include <cmath>
 #include <crow/app.h>
 #include <crow/common.h>
 #include <crow/http_request.h>
@@ -40,11 +41,7 @@ cc::utils::Result<void> Server::calculateCalories(
         this->foodService_->getOrFetchByBarcode(food_dic[0].get<std::string>());
     if (food_result) {
       cc::models::Food food = food_result.unwrap();
-      // #todo
-      // remove serving_size from food , i want to give it as a parameter to
-      // totalKcal function .
-      food.setServingSizeG(food_dic[1].get<double>());
-      totalKcal += food.totalKcal();
+      totalKcal += food.totalKcal(food_dic[1].get<double>());
     } else {
       return cc::utils::Result<void>::fail(food_result.unwrap_error().code,
                                            food_result.unwrap_error().message);
@@ -54,9 +51,9 @@ cc::utils::Result<void> Server::calculateCalories(
   return cc::utils::Result<void>::ok();
 }
 cc::utils::Result<void> Server::attachMacros_to_one_meal(nlohmann::json& meal) {
-  int protein_quantity_in_gram = 0;
-  int carbs_quantity_in_gram = 0;
-  int fat_quantity_in_gram = 0;
+  double protein_quantity_in_gram = 0;
+  double carbs_quantity_in_gram = 0;
+  double fat_quantity_in_gram = 0;
   for (auto food_dic : meal.at("foodItems")) {
     cc::utils::Result<cc::models::Food> food_result =
         this->foodService_->getOrFetchByBarcode(food_dic[0].get<std::string>());
@@ -80,11 +77,11 @@ cc::utils::Result<void> Server::attachMacros_to_one_meal(nlohmann::json& meal) {
     }
   }
   meal[magic_enum::enum_name(cc::models::NutrientType::Protein)] =
-      protein_quantity_in_gram;
+      std::round(protein_quantity_in_gram);
   meal[magic_enum::enum_name(cc::models::NutrientType::Carbs)] =
-      carbs_quantity_in_gram;
+      std::round(carbs_quantity_in_gram);
   meal[magic_enum::enum_name(cc::models::NutrientType::Fat)] =
-      fat_quantity_in_gram;
+      std::round(fat_quantity_in_gram);
   return cc::utils::Result<void>::ok();
 }
 
@@ -184,8 +181,6 @@ void Server::setupRoutes() {
         new_food.setBrand(body["brand"].s());
         new_food.setBarcode(body["barcode"].s());
         new_food.setCaloriesPer100g(body["caloriePer100g"].d());
-        new_food.setServingSizeG(
-            body["servingSizeG"].d());  // default serving size 40g
         new_food.setSource(cc::models::SOURCE::Manual);
         // new_food.setNutrients({{"Protein", 24, "g"}, {"Carbs", 100, "g"}});
         //  nutrition is optional
@@ -234,8 +229,6 @@ void Server::setupRoutes() {
         new_food.setBrand(body["brand"].s());
         new_food.setBarcode(body["barcode"].s());
         new_food.setCaloriesPer100g(body["caloriePer100g"].d());
-        new_food.setServingSizeG(
-            body["servingSizeG"].d());  // default serving size 40g
         new_food.setSource(cc::models::SOURCE::Manual);
         std::vector<cc::models::Nutrient> nutrients;
         if (body.has("nutrient")) {

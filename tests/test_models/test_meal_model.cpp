@@ -50,7 +50,6 @@ TEST_F(MealModelTest, addFoodItem) {
     minina.setBrand(std::string("wlad 3icha l3arbi"));
     minina.setBarcode(std::string("2131654967498"));
     minina.setCaloriesPer100g(420.0);
-    minina.setServingSizeG(40.0); // default serving size 40g
     minina.setSource(SOURCE::Manual);
     minina.setImageUrl(std::string("https://example.com/granola.jpg"));
     meal.addFoodItem(minina.id(), 50);
@@ -66,7 +65,6 @@ TEST_F(MealModelTest, removeFoodItem) {
     minina.setBrand(std::string("wlad 3icha l3arbi"));
     minina.setBarcode(std::string("2131654967498"));
     minina.setCaloriesPer100g(420.0);
-    minina.setServingSizeG(40.0); // default serving size 40g
     minina.setSource(SOURCE::Manual);
     minina.setImageUrl(std::string("https://example.com/granola.jpg"));
     meal.addFoodItem(minina.id(), 50);
@@ -86,7 +84,6 @@ TEST_F(MealModelTest, setFoodItems) {
     minina.setBrand(std::string("wlad 3icha l3arbi"));
     minina.setBarcode(std::string("2131654967498"));
     minina.setCaloriesPer100g(420.0);
-    minina.setServingSizeG(40.0); // default serving size 40g
     minina.setSource(SOURCE::Manual);
     minina.setImageUrl(std::string("https://example.com/granola.jpg"));
 
@@ -97,7 +94,6 @@ TEST_F(MealModelTest, setFoodItems) {
     minina_2.setBrand(std::string("factory_xx"));
     minina_2.setBarcode(std::string("88877788888"));
     minina_2.setCaloriesPer100g(420.0);
-    minina_2.setServingSizeG(40.0); // default serving size 40g
     minina_2.setSource(SOURCE::Manual);
     minina_2.setImageUrl(std::string("https://example.com/granola.jpg"));
 

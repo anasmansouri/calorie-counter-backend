@@ -16,8 +16,6 @@ class Food {
     Food() = default;
     Food(std::string id_, std::string name_, double caloriesPer100g_,
          std::vector<Nutrient> nutrient_,
-         std::optional<double>
-             servingSizeG_, // by default zero until we know how much the user want to consume
          std::optional<std::string> barcode_, std::optional<std::string> brand_,
          std::optional<std::string> imageUrl_);
 
@@ -38,11 +36,11 @@ class Food {
     double caloriesPer100g() const;
     void setCaloriesPer100g(double kcal);
 
-    double totalKcal() const; // it is a getter and not const while i need to calculate totalKcal
+    double totalKcal(double servingSizeG) const; // it is a getter and not const while i need to calculate totalKcal
                               // before i give it back no need to implement setter
 
-    const std::optional<double>& servingSizeG() const;
-    void setServingSizeG(std::optional<double> g);
+    // const std::optional<double>& servingSizeG() const;
+    //void setServingSizeG(std::optional<double> g);
 
     const std::vector<Nutrient>& nutrients() const;
     // std::vector<Nutrient>& nutrients();              // mutable access (for building)
@@ -63,7 +61,6 @@ class Food {
     double totalKcal_{0.0};
     double caloriesPer100g_{0.0};
     std::vector<Nutrient> nutrients_;
-    std::optional<double> servingSizeG_;
     std::optional<std::string> barcode_;
     std::optional<std::string> brand_;
     std::optional<std::string> imageUrl_{"img_url_empty"};
@@ -81,7 +78,6 @@ inline void to_json(nlohmann::json& j, const cc::models::Food& f) {
          {"name", f.name()},
          {"nutrient", nutrient_array},
          {"caloriesPer100g", f.caloriesPer100g()},
-         {"servingSizeG", f.servingSizeG()},
          {"barcode", f.barcode()},
          {"brand", f.brand()},
          {"imageUrl", f.imageUrl()},
@@ -101,11 +97,6 @@ inline void from_json(const nlohmann::json& j, cc::models::Food& f) {
         }
     }
     f.setNutrients(vector_of_nutrients);
-    if (j.contains("servingSizeG") && !j.at("servingSizeG").is_null()) {
-        f.setServingSizeG(j.at("servingSizeG").get<std::optional<double>>().value());
-    } else {
-        f.setServingSizeG(0);
-    }
     f.setBarcode(j.at("barcode").get<std::optional<std::string>>().value());
     f.setBrand(j.at("brand").get<std::optional<std::string>>().value());
     f.setImageUrl(j.at("imageUrl").get<std::string>());

@@ -1,4 +1,5 @@
 #include "models/food.hpp"
+#include "models/nutrient.hpp"
 #include "storage/JsonFoodRepository.hpp"
 #include "utils/Result.hpp"
 #include <chrono>
@@ -21,10 +22,9 @@ protected:
     food.setBrand("Aicha");
     food.setBarcode("0707070");
     food.setCaloriesPer100g(200);
-    food.setServingSizeG(100);
     food.setSource(cc::models::SOURCE::Manual);
     food.setImageUrl(std::string("https://example.com/granola.jpg"));
-    food.setNutrients({{"Protein", 24, "g"}, {"Carbs", 100, "g"}});
+    food.setNutrients({{cc::models::NutrientType::Protein, 24, "g"}, {cc::models::NutrientType::Carbs, 100, "g"}});
   }
 
   void TearDown() override { // runs AFTER each TEST_F
@@ -57,16 +57,16 @@ TEST_F(JsonFoodRepositoryTest, save_and_data_base_empty) {
             food.imageUrl());
   EXPECT_EQ(repo_temp.getById_or_Barcode(food.id()).unwrap().caloriesPer100g(),
             food.caloriesPer100g());
-  EXPECT_EQ(repo_temp.getById_or_Barcode(food.id()).value.value().totalKcal(),
-            food.totalKcal());
+  EXPECT_EQ(repo_temp.getById_or_Barcode(food.id()).value.value().totalKcal(100),
+            food.totalKcal(100));
   EXPECT_EQ(repo_temp.getById_or_Barcode(food.id()).unwrap().to_string(),
             food.to_string());
   EXPECT_EQ(
-      repo_temp.getById_or_Barcode(food.id()).unwrap().nutrients()[0].name(),
-      food.nutrients()[0].name());
+      repo_temp.getById_or_Barcode(food.id()).unwrap().nutrients()[0].type(),
+      food.nutrients()[0].type());
   EXPECT_EQ(
-      repo_temp.getById_or_Barcode(food.id()).unwrap().nutrients()[1].name(),
-      food.nutrients()[1].name());
+      repo_temp.getById_or_Barcode(food.id()).unwrap().nutrients()[1].type(),
+      food.nutrients()[1].type());
   // remove file , so it is always empty data base
   std::remove(path_to_temp_db.c_str());
 }
@@ -98,14 +98,14 @@ TEST_F(JsonFoodRepositoryTest, getById_or_Barcode) {
             food.imageUrl());
   EXPECT_EQ(repo.getById_or_Barcode(food.id()).unwrap().caloriesPer100g(),
             food.caloriesPer100g());
-  EXPECT_EQ(repo.getById_or_Barcode(food.id()).value.value().totalKcal(),
-            food.totalKcal());
+  EXPECT_EQ(repo.getById_or_Barcode(food.id()).value.value().totalKcal(100),
+            food.totalKcal(100));
   EXPECT_EQ(repo.getById_or_Barcode(food.id()).unwrap().to_string(),
             food.to_string());
-  EXPECT_EQ(repo.getById_or_Barcode(food.id()).unwrap().nutrients()[0].name(),
-            food.nutrients()[0].name());
-  EXPECT_EQ(repo.getById_or_Barcode(food.id()).unwrap().nutrients()[1].name(),
-            food.nutrients()[1].name());
+  EXPECT_EQ(repo.getById_or_Barcode(food.id()).unwrap().nutrients()[0].type(),
+            food.nutrients()[0].type());
+  EXPECT_EQ(repo.getById_or_Barcode(food.id()).unwrap().nutrients()[1].type(),
+            food.nutrients()[1].type());
 }
 
 TEST_F(JsonFoodRepositoryTest, getById_or_Barcode_ITEM_NOT_FOUND) {
@@ -127,12 +127,12 @@ TEST_F(JsonFoodRepositoryTest, list) {
   EXPECT_EQ(food_list.unwrap()[0].source(), food.source());
   EXPECT_EQ(food_list.unwrap()[0].imageUrl(), food.imageUrl());
   EXPECT_EQ(food_list.unwrap()[0].caloriesPer100g(), food.caloriesPer100g());
-  EXPECT_EQ(food_list.unwrap()[0].totalKcal(), food.totalKcal());
+  EXPECT_EQ(food_list.unwrap()[0].totalKcal(100), food.totalKcal(100));
   EXPECT_EQ(food_list.unwrap()[0].to_string(), food.to_string());
-  EXPECT_EQ(food_list.unwrap()[0].nutrients()[0].name(),
-            food.nutrients()[0].name());
-  EXPECT_EQ(food_list.unwrap()[0].nutrients()[1].name(),
-            food.nutrients()[1].name());
+  EXPECT_EQ(food_list.unwrap()[0].nutrients()[0].type(),
+            food.nutrients()[0].type());
+  EXPECT_EQ(food_list.unwrap()[0].nutrients()[1].type(),
+            food.nutrients()[1].type());
   std::remove(path_to_temp_db.c_str());
 }
 TEST_F(JsonFoodRepositoryTest, list_cant_open_data_base) {

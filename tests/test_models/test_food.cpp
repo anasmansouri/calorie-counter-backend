@@ -20,7 +20,6 @@ class FoodModelTest : public ::testing::Test {
         food.setBrand("Aicha");
         food.setBarcode("0707070");
         food.setCaloriesPer100g(200);
-        food.setServingSizeG(100);
         food.setSource(SOURCE::Manual);
         food.setImageUrl(std::string("https://example.com/granola.jpg"));
     }
@@ -34,17 +33,16 @@ class FoodModelTest : public ::testing::Test {
 };
 
 TEST_F(FoodModelTest, initializition) {
-    std::vector<Nutrient> nutrients{Nutrient{"Protein", 24, "g"}, Nutrient{"Carbs", 100, "g"}};
+    std::vector<Nutrient> nutrients{Nutrient{NutrientType::Protein, 24, "g"}, Nutrient{NutrientType::Carbs, 100, "g"}};
     Food food{"0000", "minina",  200,     nutrients,
-              200,    "0707070", "Aicha", std::string("https://example.com/granola.jpg")};
+                 "0707070", "Aicha", std::string("https://example.com/granola.jpg")};
     EXPECT_EQ(food.id(), "0000");
     EXPECT_EQ(food.name(), "minina");
     EXPECT_EQ(food.brand(), "Aicha");
     EXPECT_EQ(food.barcode(), "0707070");
     EXPECT_EQ(food.caloriesPer100g(), 200);
-    EXPECT_EQ(food.servingSizeG(), 200);
-    EXPECT_EQ(food.nutrients()[0].name(), "Protein");
-    EXPECT_EQ(food.nutrients()[1].name(), "Carbs");
+    EXPECT_EQ(food.nutrients()[0].type(), NutrientType::Protein);
+    EXPECT_EQ(food.nutrients()[1].type(), NutrientType::Carbs);
 }
 TEST_F(FoodModelTest, setId) {
     Food food;
@@ -71,17 +69,13 @@ TEST_F(FoodModelTest, setCaloriesPer100g) {
     food.setCaloriesPer100g(500);
     EXPECT_EQ(food.caloriesPer100g(), 500);
 }
-TEST_F(FoodModelTest, setServingSizeG) {
-    Food food;
-    food.setServingSizeG(100);
-    EXPECT_EQ(food.servingSizeG(), 100);
-}
+
 TEST_F(FoodModelTest, setNutrients) {
     Food food;
-    std::vector<Nutrient> nutrients{Nutrient{"Protein", 24, "g"}, Nutrient{"Carbs", 100, "g"}};
+    std::vector<Nutrient> nutrients{Nutrient{NutrientType::Protein, 24, "g"}, Nutrient{NutrientType::Carbs, 100, "g"}};
     food.setNutrients(nutrients);
-    EXPECT_EQ(food.nutrients()[0].name(), "Protein");
-    EXPECT_EQ(food.nutrients()[1].name(), "Carbs");
+    EXPECT_EQ(food.nutrients()[0].type(), NutrientType::Protein);
+    EXPECT_EQ(food.nutrients()[1].type(), NutrientType::Carbs);
 }
 TEST_F(FoodModelTest, setSource) {
     Food food;
@@ -89,15 +83,14 @@ TEST_F(FoodModelTest, setSource) {
     EXPECT_EQ(food.source(), SOURCE::Manual);
 }
 TEST_F(FoodModelTest, to_Json) {
-    std::vector<Nutrient> nutrients{Nutrient{"Protein", 24, "g"}, Nutrient{"Carbs", 100, "g"}};
+    std::vector<Nutrient> nutrients{Nutrient{NutrientType::Protein, 24, "g"}, Nutrient{NutrientType::Carbs, 100, "g"}};
     food.setNutrients(nutrients);
     nlohmann::json food_json = food;
     EXPECT_EQ(food_json["name"].get<std::string>(), "minina");
     EXPECT_EQ(food_json["id"].get<std::string>(), "00000");
     EXPECT_EQ(food_json["caloriesPer100g"].get<double>(), 200);
-    EXPECT_EQ(food_json["servingSizeG"].get<double>(), 100);
-    EXPECT_EQ(food_json["nutrient"][0]["name"].get<std::string>(), "Protein");
-    EXPECT_EQ(food_json["nutrient"][1]["name"].get<std::string>(), "Carbs");
+    EXPECT_EQ(magic_enum::enum_cast<NutrientType>(food_json["nutrient"][0]["type"].get<std::string>()), NutrientType::Protein);
+    EXPECT_EQ(magic_enum::enum_cast<NutrientType>(food_json["nutrient"][1]["type"].get<std::string>()), NutrientType::Carbs);
 }
 
 TEST_F(FoodModelTest, setImageUrl) {
@@ -111,14 +104,13 @@ TEST_F(FoodModelTest, from_Json) {
     food_json["name"] = "maticha";
     food_json["id"] = "0099";
     food_json["caloriesPer100g"] = 90;
-    food_json["servingSizeG"] = 100;
     food_json["barcode"] = "0000111999";
     food_json["brand"] = "Aicha";
     food_json["imageUrl"] = "https://example.com/granola.jpg";
     food_json["source"] = magic_enum::enum_name(SOURCE::Online);
     // #####################
     nlohmann::json nutrient_json;
-    nutrient_json["name"] = "Protein";
+    nutrient_json["type"] = magic_enum::enum_name(NutrientType::Protein);
     nutrient_json["value"] = 10;
     nutrient_json["unit"] = "g";
     food_json["nutrient"] = nlohmann::json::array();
@@ -129,21 +121,20 @@ TEST_F(FoodModelTest, from_Json) {
     EXPECT_EQ(food.name(), food_json["name"].get<std::string>());
     EXPECT_EQ(food.id(), food_json["id"].get<std::string>());
     EXPECT_EQ(food.caloriesPer100g(), food_json["caloriesPer100g"].get<double>());
-    EXPECT_EQ(food.servingSizeG(), food_json["servingSizeG"].get<double>());
     EXPECT_EQ(food.barcode(), food_json["barcode"].get<std::string>());
     EXPECT_EQ(food.brand(), food_json["brand"].get<std::string>());
     EXPECT_EQ(food.imageUrl(), food_json["imageUrl"].get<std::string>());
     EXPECT_EQ(magic_enum::enum_name((food.source())), food_json["source"].get<std::string>());
-    EXPECT_EQ(food.nutrients()[0].name(), food_json["nutrient"][0]["name"].get<std::string>());
+    EXPECT_EQ(food.nutrients()[0].type(), magic_enum::enum_cast<NutrientType>(food_json["nutrient"][0]["type"].get<std::string>()));
 }
 
 TEST_F(FoodModelTest, totalKcal) {
-    EXPECT_EQ(food.totalKcal(), food.servingSizeG().value() * food.caloriesPer100g());
+    EXPECT_EQ(food.totalKcal(100), 100 * food.caloriesPer100g()/100);
 }
 
 TEST_F(FoodModelTest, to_string) {
     std::string food_string =
-        std::format("{} : {} : {}", food.name(), food.id(), food.servingSizeG().value());
+        std::format("{} : {}", food.name(), food.id());
     EXPECT_EQ(food_string, food.to_string());
 }
 

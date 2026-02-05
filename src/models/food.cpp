@@ -9,17 +9,17 @@ namespace cc {
 namespace models {
 
 Food::Food(std::string id_, std::string name_, double caloriesPer100g_,
-           std::vector<Nutrient> nutrient_, std::optional<double> servingSizeG_,
+           std::vector<Nutrient> nutrient_, 
            std::optional<std::string> barcode_, std::optional<std::string> brand_,
            std::optional<std::string> imageUrl_)
     : id_{id_}, name_{name_}, caloriesPer100g_{caloriesPer100g_}, nutrients_{nutrient_},
-      servingSizeG_{servingSizeG_}, barcode_{barcode_}, brand_{brand_}, imageUrl_{imageUrl_} {
+     barcode_{barcode_}, brand_{brand_}, imageUrl_{imageUrl_} {
     // #todo double check this comment , kaybanli masaleh lwalo
     // this->servingSizeG_=0; // mchkok fhadi 3lach servingSizeG intialiazed by 0
 }
 
 std::string Food::to_string() const {
-    return std::format("{} : {} : {}", this->name_, this->id_, this->servingSizeG_.value());
+    return std::format("{} : {}", this->name_, this->id_);
 }
 // Name
 void Food::setName(std::string n) {
@@ -62,12 +62,6 @@ void Food::setCaloriesPer100g(double kcal) {
     this->caloriesPer100g_ = kcal;
 }
 
-const std::optional<double>& Food::servingSizeG() const {
-    return this->servingSizeG_;
-}
-void Food::setServingSizeG(std::optional<double> g) {
-    this->servingSizeG_ = g;
-}
 
 // Nutrient
 
@@ -96,8 +90,8 @@ void Food::setSource(SOURCE s) {
 }
 
 // totalKcal
-double Food::totalKcal() const {
-    return (this->servingSizeG_.value()) * (this->caloriesPer100g_)/100;
+double Food::totalKcal(double servingSizeG) const {
+    return (servingSizeG) * (this->caloriesPer100g_)/100;
 }
 } // namespace models
 } // namespace cc

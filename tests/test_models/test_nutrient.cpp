@@ -1,3 +1,4 @@
+#include "magic_enum.hpp"
 #include "models/food.hpp"
 #include "models/nutrient.hpp"
 #include <chrono>
@@ -22,15 +23,15 @@ class NutrientModelTest : public ::testing::Test {
 };
 
 TEST_F(NutrientModelTest, initializition) {
-    Nutrient nutrient("Protein", 35, "g");
-    EXPECT_EQ(nutrient.name(), "Protein");
+    Nutrient nutrient(NutrientType::Protein, 35, "g");
+    EXPECT_EQ(nutrient.type(), NutrientType::Protein);
     EXPECT_EQ(nutrient.unit(), "g");
     EXPECT_EQ(nutrient.value(), 35);
 }
 
-TEST_F(NutrientModelTest, setName) {
-    nutrient.setName("Carbs");
-    EXPECT_EQ(nutrient.name(), "Carbs");
+TEST_F(NutrientModelTest, setType) {
+    nutrient.setType(NutrientType::Carbs);
+    EXPECT_EQ(nutrient.type(), NutrientType::Carbs);
 }
 
 TEST_F(NutrientModelTest, setUnit) {
@@ -42,22 +43,22 @@ TEST_F(NutrientModelTest, setValue) {
     EXPECT_EQ(nutrient.value(), 45);
 }
 TEST_F(NutrientModelTest, to_json) {
-    Nutrient nutrient("Protein", 35, "g");
+    Nutrient nutrient(NutrientType::Protein, 35, "g");
     nlohmann::json nutrient_json_format = nutrient;
-    EXPECT_EQ(nutrient_json_format["name"].get<std::string>(), nutrient.name());
+    EXPECT_EQ(magic_enum::enum_cast<NutrientType>(nutrient_json_format["type"].get<std::string>()), nutrient.type());
     EXPECT_EQ(nutrient_json_format["value"].get<double>(), nutrient.value());
     EXPECT_EQ(nutrient_json_format["unit"].get<std::string>(), nutrient.unit());
 }
 TEST_F(NutrientModelTest, from_json) {
-    nlohmann::json nutrient_json_format = {{"name", "Protein"}, {"value", 100}, {"unit", "g"}};
+    nlohmann::json nutrient_json_format = {{"type", magic_enum::enum_name(NutrientType::Protein)}, {"value", 100}, {"unit", "g"}};
     Nutrient nutrient = nutrient_json_format;
-    EXPECT_EQ(nutrient.name(), nutrient_json_format["name"].get<std::string>());
+    EXPECT_EQ(nutrient.type(), magic_enum::enum_cast<NutrientType>(nutrient_json_format["type"].get<std::string>()));
     EXPECT_EQ(nutrient.value(), nutrient_json_format["value"].get<double>());
     EXPECT_EQ(nutrient.unit(), nutrient_json_format["unit"].get<std::string>());
 }
 TEST_F(NutrientModelTest, to_string) {
-    Nutrient nutrient("Protein", 35, "g");
+    Nutrient nutrient(NutrientType::Protein, 35, "g");
     std::string nutrient_string =
-        std::format("{} : {} : {}", nutrient.name(), nutrient.value(), nutrient.unit());
+        std::format("{} : {} : {}", magic_enum::enum_name(nutrient.type()), nutrient.value(), nutrient.unit());
     EXPECT_EQ(nutrient_string, nutrient.to_string());
 }
