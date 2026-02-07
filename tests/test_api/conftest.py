@@ -7,11 +7,6 @@ import pytest
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 
-# ✅ Adjust this to your actual binary path
-# Examples you might have:
-#   build/bin/cc_app
-#   build/cc_app
-#   bin/cc_app
 SERVER_BIN = os.path.join(PROJECT_ROOT, "build", "bin", "cc_app")
 
 HOST = "http://127.0.0.1:18080"
@@ -44,17 +39,13 @@ def server_process():
     log_path = os.path.join(os.path.dirname(__file__), "server.log")
     err_path = os.path.join(os.path.dirname(__file__), "server.err")
 
-    # If your app supports an env var for test DB, set it here:
-    # env = os.environ.copy()
-    # env["CC_DB_PATH"] = "/tmp/cc_test_db.json"
-
     with open(log_path, "w") as out, open(err_path, "w") as err:
-        p = subprocess.Popen([SERVER_BIN], stdout=out, stderr=err, env=env)  # env=env if needed
+        p = subprocess.Popen([SERVER_BIN], stdout=out, stderr=err, env=env,stdin=subprocess.PIPE)
+            
         try:
             _wait_until_ready()
             yield p
         finally:
-            # graceful stop
             try:
                 p.send_signal(signal.SIGINT)
                 p.wait(timeout=3)
