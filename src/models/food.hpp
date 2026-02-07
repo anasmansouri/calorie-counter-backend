@@ -19,7 +19,6 @@ class Food {
          std::optional<std::string> barcode_, std::optional<std::string> brand_,
          std::optional<std::string> imageUrl_);
 
-    // IDs & identity
     const std::string& id() const;
     void setId(std::string id);
 
@@ -32,25 +31,19 @@ class Food {
     const std::optional<std::string>& barcode() const;
     void setBarcode(std::optional<std::string> b);
 
-    // nutrition
     double caloriesPer100g() const;
     void setCaloriesPer100g(double kcal);
 
-    double totalKcal(double servingSizeG) const; // it is a getter and not const while i need to calculate totalKcal
-                              // before i give it back no need to implement setter
-
-    // const std::optional<double>& servingSizeG() const;
-    //void setServingSizeG(std::optional<double> g);
+    double totalKcal(double servingSizeG) const;
 
     const std::vector<Nutrient>& nutrients() const;
-    // std::vector<Nutrient>& nutrients();              // mutable access (for building)
     void setNutrients(std::vector<Nutrient> ns);
 
     // media/source
     const std::optional<std::string>& imageUrl() const;
     void setImageUrl(std::optional<std::string> url);
 
-    const SOURCE& source() const; // "off" | "manual" | ...
+    const SOURCE& source() const;
     void setSource(SOURCE s);
 
     std::string to_string() const;

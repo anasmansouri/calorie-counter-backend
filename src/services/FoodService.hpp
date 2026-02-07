@@ -35,7 +35,6 @@ class FoodService {
   private:
     std::shared_ptr<cc::storage::FoodRepository> repo_;
     std::shared_ptr<cc::clients::OpenFoodFactsClient> off_;
-    int cacheTtlSeconds_ = 0;
 };
 
 } // namespace cc::services

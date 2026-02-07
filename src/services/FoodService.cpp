@@ -34,7 +34,6 @@ cc::utils::Result<cc::models::Food> FoodService::getOrFetchByBarcode(const std::
 // #todo zed der les cas , bach thkam l program
 cc::utils::Result<void> FoodService::addManualFood(const cc::models::Food& food) {
     cc::utils::Result<void> result = this->repo_->save(food);
-    // if true food is saved correctly
     if (result) {
         return cc::utils::Result<void>::ok();
     } else {
@@ -45,7 +44,6 @@ cc::utils::Result<void> FoodService::addManualFood(const cc::models::Food& food)
 
 cc::utils::Result<void> FoodService::updateFood(const cc::models::Food& food) {
     cc::utils::Result<void> result = this->repo_->upsert(food);
-    // if true food is saved correctly
     if (result) {
         return cc::utils::Result<void>::ok();
     } else {
@@ -80,7 +78,7 @@ cc::utils::Result<std::vector<cc::models::Food>> FoodService::listFoods(int offs
         return result;
     } else {
         return cc::utils::Result<std::vector<cc::models::Food>>::fail(
-            cc::utils::ErrorCode::NotFound, "can't access, or access is forbiden ");
+            cc::utils::ErrorCode::NotFound, "can't access, or access is forbiden");
     }
 }
 } // namespace services

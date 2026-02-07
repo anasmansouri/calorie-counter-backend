@@ -250,5 +250,4 @@ cc::utils::Result<void> JsonMealRepository::clear() {
   }
 }
 
-void JsonMealRepository::setFlushOnWrite(bool enable) {}
 }  // namespace cc::storage

@@ -53,7 +53,6 @@ bool MealLog::removeFoodItem(const std::string& foodId) {
     for (auto it = this->food_items_.begin(); it != this->food_items_.end(); it++) {
         if (it->first == foodId) {
             this->food_items_.erase(it);
-            // maybe you need to remove it from the data base
             return true;
         }
     }

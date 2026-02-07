@@ -50,14 +50,10 @@ inline void to_json(nlohmann::json& j, const cc::models::MealLog& m) {
          },
          {"tsUtc", cc::utils::toIso8601(m.gettime())}};
 }
-// mrowena had l function
+
 inline void from_json(const nlohmann::json& j, cc::models::MealLog& m) {
     auto meal_name = magic_enum::enum_cast<MEALNAME>(j.at("name").get<std::string>());
-    if (meal_name) {
-        m.setName(meal_name.value());
-    } else {
-        m.setName(MEALNAME::Breakfast);
-    }
+    m.setName(meal_name.value_or(MEALNAME::Breakfast));
     m.setId(j.at("id").get<int>());
     m.setTime(cc::utils::fromIso8601(j.at("tsUtc").get<std::string>()));
     m.setFoodItems(j.at("foodItems").get<std::vector<std::pair<std::string, double>>>());

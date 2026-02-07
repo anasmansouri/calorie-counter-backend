@@ -1,11 +1,7 @@
 #include "magic_enum.hpp"
-#include "models/food.hpp"
 #include "models/nutrient.hpp"
-#include <chrono>
 #include <gtest/gtest.h>
 #include <string>
-#include <utility>
-#include <vector>
 
 using namespace cc::models;
 

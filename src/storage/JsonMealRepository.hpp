@@ -41,7 +41,6 @@ class JsonMealRepository : public MealRepository {
 
   private:
     std::string filePath_;
-    bool flushOnWrite_ = true;
     mutable std::mutex mtx_;
 };
 

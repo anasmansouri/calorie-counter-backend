@@ -1,6 +1,4 @@
 #pragma once
-#include <format>
-#include <iostream>
 #include <nlohmann/json.hpp>
 #include <string>
 #include <magic_enum.hpp>
@@ -9,9 +7,9 @@ namespace cc::models {
 enum class NutrientType{Protein,Carbs,Fat,Unknown};
 class Nutrient {
   private:
-    NutrientType type_;      // Protein , Carbs , Fat
+    NutrientType type_;      
     double value_{0.0};     // per 100g basis
-    std::string unit_{"g"}; // eg. "g", "mg"
+    std::string unit_{"g"};
 
   public:
     // constructors

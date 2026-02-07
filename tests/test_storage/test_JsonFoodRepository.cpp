@@ -2,14 +2,11 @@
 #include "models/nutrient.hpp"
 #include "storage/JsonFoodRepository.hpp"
 #include "utils/Result.hpp"
-#include <chrono>
 #include <cstdio>
 #include <format>
 #include <gtest/gtest.h>
-#include <iostream>
 #include <pstl/glue_algorithm_defs.h>
 #include <string>
-#include <utility>
 #include <vector>
 
 using namespace cc::storage;
@@ -31,10 +28,11 @@ protected:
                              // nothing to destroy //
   }
 
-  std::string path_to_temp_db{"/tmp/cc_UT_test_db.json"};
-  std::string wrong_path_to_temp_db{"/tmmp/cc_UT_test_db.json"};
 
   // helper functions and members visible to all TEST_F in this suite
+  
+  std::string path_to_temp_db{"/tmp/cc_UT_test_db.json"};
+  std::string wrong_path_to_temp_db{"/tmmp/cc_UT_test_db.json"};
 
   JsonFoodRepository repo{path_to_temp_db};
   cc::models::Food food;

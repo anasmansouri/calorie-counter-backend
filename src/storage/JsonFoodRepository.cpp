@@ -15,8 +15,7 @@ cc::utils::Result<void> JsonFoodRepository::save(const cc::models::Food &food) {
   }
   for (auto item : file_content) {
     if (item["id"] == food.id()) {
-      // no need to save this food again , because there is only one barcode per
-      // food
+      // no need to save this food again , because there is only one barcode per food
       return cc::utils::Result<void>::ok();
     }
   }
@@ -163,5 +162,4 @@ cc::utils::Result<void> JsonFoodRepository::clear() {
   }
 }
 
-void JsonFoodRepository::setFlushOnWrite(bool enable) {}
 } // namespace cc::storage

@@ -3,7 +3,6 @@
 #include "utils/date_time_utils.hpp"
 #include <chrono>
 #include <gtest/gtest.h>
-#include <iterator>
 #include <magic_enum.hpp>
 #include <string>
 #include <utility>
@@ -21,7 +20,6 @@ class MealModelTest : public ::testing::Test {
                                // nothing to destroy                                //
     }
 
-    // helper functions and members visible to all TEST_F in this suite
     MealLog meal;
 };
 
@@ -38,7 +36,6 @@ TEST_F(MealModelTest, setName) {
 }
 
 TEST_F(MealModelTest, setId) {
-    // std::chrono::system_clock::time_point tp = std::chrono::system_clock::now();
     meal.setId(1);
     EXPECT_EQ(meal.id(), 1);
 }
@@ -47,7 +44,7 @@ TEST_F(MealModelTest, addFoodItem) {
     cc::models::Food minina;
     minina.setId("2131654967498");
     minina.setName("minina");
-    minina.setBrand(std::string("wlad 3icha l3arbi"));
+    minina.setBrand(std::string("aicha"));
     minina.setBarcode(std::string("2131654967498"));
     minina.setCaloriesPer100g(420.0);
     minina.setSource(SOURCE::Manual);
@@ -62,7 +59,7 @@ TEST_F(MealModelTest, removeFoodItem) {
     cc::models::Food minina;
     minina.setId("2131654967498");
     minina.setName("minina");
-    minina.setBrand(std::string("wlad 3icha l3arbi"));
+    minina.setBrand(std::string("aicha"));
     minina.setBarcode(std::string("2131654967498"));
     minina.setCaloriesPer100g(420.0);
     minina.setSource(SOURCE::Manual);
@@ -81,7 +78,7 @@ TEST_F(MealModelTest, setFoodItems) {
     cc::models::Food minina;
     minina.setId("2131654967498");
     minina.setName("minina");
-    minina.setBrand(std::string("wlad 3icha l3arbi"));
+    minina.setBrand(std::string("aicha"));
     minina.setBarcode(std::string("2131654967498"));
     minina.setCaloriesPer100g(420.0);
     minina.setSource(SOURCE::Manual);

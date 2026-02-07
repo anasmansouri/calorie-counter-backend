@@ -24,7 +24,6 @@ class MealRepository {
                                                                      int limit = 50) = 0;
     virtual cc::utils::Result<void> remove(int id) = 0;
 
-    // optional:
     // update or insert if doesn't exist
     virtual cc::utils::Result<void> upsert(const cc::models::MealLog& meal) = 0;
     // clear all records

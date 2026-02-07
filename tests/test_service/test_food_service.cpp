@@ -1,20 +1,14 @@
 #include "clients/OpenFoodFactsClient.hpp"
 #include "models/food.hpp"
-#include "models/meal_log.hpp"
 #include "models/nutrient.hpp"
 #include "services/FoodService.hpp"
-#include "storage/FoodRepository.hpp"
 #include "storage/JsonFoodRepository.hpp"
 #include "utils/Result.hpp"
-#include "utils/date_time_utils.hpp"
-#include <chrono>
 #include <format>
 #include <gtest/gtest.h>
-#include <iterator>
 #include <magic_enum.hpp>
 #include <memory>
 #include <string>
-#include <utility>
 #include <vector>
 
 using namespace cc::services;
@@ -220,7 +214,6 @@ TEST_F(FoodServiceTest, getOrFetchByBarcode) {
   EXPECT_EQ(whey_protein_food.unwrap().id(), whey_protein_barcode);
 
   // Fetch from local data base because it is already saved to local data base
-  // food_service.addManualFood(kefir.unwrap());
   cc::utils::Result<cc::models::Food> food =
       food_service.getOrFetchByBarcode(whey_protein_barcode);
   EXPECT_EQ(food.unwrap().id(), whey_protein_barcode);

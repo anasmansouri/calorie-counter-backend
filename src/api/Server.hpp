@@ -5,6 +5,7 @@
 #include "services/FoodService.hpp"
 #include "services/MealService.hpp"
 #include "utils/Json_utils.hpp"
+#include "utils/common_functions.hpp"
 #include "utils/Result.hpp"
 #include <crow.h>
 
@@ -31,7 +32,6 @@ class Server {
     void setupRoutes();
     void start();
     void stop();
-    void enableCors(bool enable);
     cc::utils::Result<void> attachMacros_to_meals(nlohmann::json& meals);
     cc::utils::Result<void> attachMacros_to_one_meal(nlohmann::json& meal);
     cc::utils::Result<void> calculateCalories(nlohmann::json& meal);

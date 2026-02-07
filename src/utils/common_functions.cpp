@@ -52,4 +52,38 @@ void ensure_db_file_exists(const std::string &db_path) {
     out << "[]\n";
   }
 }
+
+
+
+
+bool canConnectTcp(std::string_view ip, std::uint16_t port) {
+  int fd = ::socket(AF_INET, SOCK_STREAM, 0);
+  if (fd < 0) return false;
+
+  sockaddr_in addr{};
+  addr.sin_family = AF_INET;
+  addr.sin_port = htons(port);
+
+  // Convert "127.0.0.1" -> binary IPv4 address
+  if (::inet_pton(AF_INET, ip.data(), &addr.sin_addr) != 1) {
+    ::close(fd);
+    return false;
+  }
+
+  bool ok = (::connect(fd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) == 0);
+  ::close(fd);
+  return ok;
+}
+
+void waitUntilListening(std::uint16_t port, std::chrono::milliseconds timeout ) {
+  using clock = std::chrono::steady_clock;
+  auto start = clock::now();
+
+  while (clock::now() - start < timeout) {
+    if (canConnectTcp("127.0.0.1", port)) return;
+    std::this_thread::sleep_for(std::chrono::milliseconds{20});
+  }
+
+  throw std::runtime_error("Server did not start listening in time");
+}
 } // namespace cc::utils

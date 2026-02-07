@@ -18,20 +18,20 @@ def test_health_ok():
 
 
 def test_search_by_barcode_missing_param_returns_404():
-    r = requests.get(f"{HOST}/search_by_barcode", timeout=1)
+    r = requests.get(f"{HOST}/foods/by_barcode", timeout=1)
     assert r.status_code == 404
     j = r.json()
     assert j["error"] == "missed barcode"
 
 
 def test_search_by_barcode_empty_param_returns_404():
-    r = requests.get(f"{HOST}/search_by_barcode?barcode=", timeout=1)
+    r = requests.get(f"{HOST}/foods/by_barcode?barcode=", timeout=1)
     assert r.status_code == 404
     j = r.json()
     assert j["error"] == "missed barcode"
 
 def test_search_by_barcode():
-    r = requests.get(f"{HOST}/search_by_barcode",params={"barcode":"4025500287955"}, timeout=1)
+    r = requests.get(f"{HOST}/foods/by_barcode",params={"barcode":"4025500287955"}, timeout=1)
     assert r.status_code == 200 
     j = r.json()
     assert j["id"] == "4025500287955"
@@ -132,7 +132,7 @@ def test_put_updates_food_then_search_returns_updated():
     assert "updated" in r2.json()["status"].lower()
 
     # If your service searches local DB first, this stays offline.
-    r3 = requests.get(f"{HOST}/search_by_barcode?barcode=008", timeout=2)
+    r3 = requests.get(f"{HOST}/foods/by_barcode?barcode=008", timeout=2)
     assert r3.status_code == 200
     assert "Rice UPDATED" in r3.text
 
@@ -172,7 +172,7 @@ def test_delete_food_then_search_should_not_find_or_should_error():
     assert r2.json()["status"] == "ok"
 
     
-    r3 = requests.get(f"{HOST}/search_by_barcode?barcode=003", timeout=2)
+    r3 = requests.get(f"{HOST}/foods/by_barcode?barcode=003", timeout=2)
 
     # expected 500
     assert r3.status_code in (404, 400, 500, 200)

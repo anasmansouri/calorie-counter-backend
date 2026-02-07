@@ -11,7 +11,6 @@ Nutrient::Nutrient(NutrientType type, double value, std::string unit)
     : type_{type}, value_{value}, unit_{unit} {
 }
 
-// Name
 const NutrientType& Nutrient::type() const {
     return this->type_;
 }
@@ -19,7 +18,6 @@ void Nutrient::setType(NutrientType type) {
     this->type_ = type;
 }
 
-// value
 double Nutrient::value() const {
     return this->value_;
 }
@@ -27,7 +25,6 @@ void Nutrient::setValue(double v) {
     this->value_ = v;
 }
 
-// Unit
 const std::string& Nutrient::unit() const {
     return this->unit_;
 }

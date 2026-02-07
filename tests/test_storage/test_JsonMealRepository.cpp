@@ -1,5 +1,4 @@
 #include <chrono>
-#include <format>
 #include <gtest/gtest.h>
 #include <pstl/glue_algorithm_defs.h>
 #include <string>
@@ -9,8 +8,6 @@
 #include "storage/JsonMealRepository.hpp"
 #include "utils/Result.hpp"
 #include <cstdio>
-#include <iostream>
-#include <utility>
 #include <vector>
 
 using namespace cc::storage;
@@ -36,9 +33,6 @@ protected:
 
   void TearDown() override { // runs AFTER each TEST_F
                              // nothing to destroy //
-
-    // std::remove(
-    //    "/home/anas/personal_projects/calorie-counter-backend/json_data_base_meals.json");
   }
 
   // helper functions and members visible to all TEST_F in this suite
@@ -65,7 +59,7 @@ TEST_F(JsonMealRepositoryTest, save_and_data_base_empty) {
   /// food
   food.setId("2131654967498");
   food.setName("food");
-  food.setBrand(std::string("wlad 3icha l3arbi"));
+  food.setBrand(std::string("aicha"));
   food.setBarcode(std::string("2131654967498"));
   food.setCaloriesPer100g(420.0);
   food.setSource(cc::models::SOURCE::Manual);
@@ -112,7 +106,7 @@ TEST_F(JsonMealRepositoryTest, test_sync_meals_id) {
   /// food
   food.setId("2131654967498");
   food.setName("food");
-  food.setBrand(std::string("wlad 3icha l3arbi"));
+  food.setBrand(std::string("aicha"));
   food.setBarcode(std::string("2131654967498"));
   food.setCaloriesPer100g(420.0);
   food.setSource(cc::models::SOURCE::Manual);

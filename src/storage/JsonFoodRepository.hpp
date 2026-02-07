@@ -21,8 +21,6 @@ class JsonFoodRepository : public FoodRepository {
     // clear all records
     cc::utils::Result<void> clear() override;
 
-    void setFlushOnWrite(bool enable);
-
     // remove copy and assign because mutex is not copyable
     // but allowing move construtor
     JsonFoodRepository(const JsonFoodRepository&) = delete;
@@ -33,7 +31,6 @@ class JsonFoodRepository : public FoodRepository {
 
   private:
     std::string filePath_;
-    bool flushOnWrite_ = true;
     mutable std::mutex mtx_;
 };
 

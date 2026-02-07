@@ -1,14 +1,10 @@
-#include "models/daily_log.hpp"
 #include "models/food.hpp"
-#include "models/meal_log.hpp"
 #include "models/nutrient.hpp"
 #include "nlohmann/json.hpp"
-#include <chrono>
 #include <format>
 #include <gtest/gtest.h>
 #include <magic_enum.hpp>
 #include <string>
-#include <utility>
 #include <vector>
 using namespace cc::models;
 
@@ -137,15 +133,3 @@ TEST_F(FoodModelTest, to_string) {
         std::format("{} : {}", food.name(), food.id());
     EXPECT_EQ(food_string, food.to_string());
 }
-
-class SOURCEModelTest : public ::testing::Test {
-  protected:
-    void SetUp() override { // runs BEFORE each TEST_F
-    }
-
-    void TearDown() override { // runs AFTER each TEST_F
-                               // nothing to destroy                                //
-    }
-
-    // helper functions and members visible to all TEST_F in this suite
-};

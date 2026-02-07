@@ -124,7 +124,7 @@ void Server::setupRoutes() {
               response_json);
         }
       });
-  CROW_ROUTE(this->app, "/search_by_barcode")
+  CROW_ROUTE(this->app, "/foods/by_barcode")
       .methods(crow::HTTPMethod::Get)([this](const crow::request& req) {
         auto barcode = req.url_params.get("barcode");
         crow::json::wvalue response_json;
@@ -555,8 +555,6 @@ void Server::setupRoutes() {
 }
 void Server::start() {
   std::call_once(this->once, [this] { this->setupRoutes(); });
-  // if(this->server_thread.joinable()){return;}
-
   try {
     this->server_thread = std::thread([this] {
       {
@@ -569,7 +567,8 @@ void Server::start() {
     // wait until thread reached the "running" point
     std::unique_lock<std::mutex> lk(m_);
     cv_.wait(lk, [this] { return running_; });
-    std::this_thread::sleep_for(std::chrono::seconds(2));
+    // now wait until port is actually listening
+    cc::utils::waitUntilListening(this->port_,std::chrono::milliseconds{2000});
   } catch (std::exception& e) {
     std::cerr << "Server thread exception" << e.what() << std::endl;
     std::terminate();
@@ -582,6 +581,5 @@ void Server::stop() {
     this->server_thread.join();
   }
 }
-void Server::enableCors(bool enable) {}
 }  // namespace api
 }  // namespace cc
