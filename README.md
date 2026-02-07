@@ -289,11 +289,3 @@ Run tests (terminal 2):
 ```bash
 pytest -q tests/test_api
 ```
-
----
-
-## Notes / Next improvements
-- Add a non-interactive run mode for Docker/CI (no “press Enter”).
-- Add Docker Compose with persistent volume + healthcheck.
-- Add `/stats/day` and `/meals/by_range` endpoints (if needed for analytics).
-
