@@ -1,12 +1,12 @@
 #include "Server.hpp"
 
-#include <cmath>
 #include <crow/app.h>
 #include <crow/common.h>
 #include <crow/http_request.h>
 #include <crow/http_response.h>
 #include <crow/json.h>
 
+#include <cmath>
 #include <cstdlib>
 #include <exception>
 #include <format>
@@ -33,9 +33,8 @@ Server::Server(int port, std::shared_ptr<cc::services::FoodService> foodService,
     : port_{port}, foodService_{foodService}, mealService_{mealService} {}
 Server::~Server() { this->stop(); }
 
-cc::utils::Result<void> Server::calculateCalories(
-    nlohmann::json& meal) {
-  double totalKcal;
+cc::utils::Result<void> Server::calculateCalories(nlohmann::json& meal) {
+  double totalKcal = 0;
   for (auto food_dic : meal.at("foodItems")) {
     cc::utils::Result<cc::models::Food> food_result =
         this->foodService_->getOrFetchByBarcode(food_dic[0].get<std::string>());
@@ -151,20 +150,45 @@ void Server::setupRoutes() {
 
   CROW_ROUTE(this->app, "/foods")
       .methods(crow::HTTPMethod::DELETE)([this](const crow::request& req) {
-        auto barcode = req.url_params.get("barcode");
-        cc::utils::Result<void> result;
-        result = this->foodService_->deleteFood(barcode);
         crow::json::wvalue response_json;
-        if (result) {
+
+        const char* barcode_c = req.url_params.get("barcode");
+        if (barcode_c == nullptr || std::string_view(barcode_c).empty()) {
+          response_json["error"] = "missed barcode";
+          return crow::response(
+              404, response_json);  // keep consistent with by_barcode
+        }
+
+        const std::string barcode{barcode_c};
+
+        cc::utils::Result<void> res = this->foodService_->deleteFood(barcode);
+
+        if (res) {
           response_json["status"] = "ok";
           return crow::response(200, response_json);
-        } else {
-          response_json["error"] = result.unwrap_error().message;
-          return crow::response(
-              cc::utils::convert_error_code_into_HTTP_Responses(
-                  result.unwrap_error().code),
-              response_json);
         }
+
+        response_json["error"] = res.unwrap_error().message;
+        return crow::response(cc::utils::convert_error_code_into_HTTP_Responses(
+                                  res.unwrap_error().code),
+                              response_json);
+      });
+
+  // DELETE /foods/clear  -> delete ALL foods
+  CROW_ROUTE(this->app, "/foods/clear")
+      .methods(crow::HTTPMethod::DELETE)([this](const crow::request&) {
+        crow::json::wvalue response_json;
+
+        auto res = this->foodService_->clear_data_base();  // you implement this
+        if (res) {
+          response_json["status"] = "ok";
+          return crow::response(200, response_json);
+        }
+
+        response_json["error"] = res.unwrap_error().message;
+        return crow::response(cc::utils::convert_error_code_into_HTTP_Responses(
+                                  res.unwrap_error().code),
+                              response_json);
       });
 
   CROW_ROUTE(this->app, "/foods")
@@ -314,7 +338,7 @@ void Server::setupRoutes() {
             for (auto& item : j) {
               this->calculateCalories(item);
             }
-          attachMacros_to_meals(j);
+            attachMacros_to_meals(j);
           }
           response_json = cc::utils::to_crow_json(j);
           return crow::response(200, response_json);
@@ -382,7 +406,7 @@ void Server::setupRoutes() {
             for (auto& item : j) {
               this->calculateCalories(item);
             }
-          attachMacros_to_meals(j);
+            attachMacros_to_meals(j);
           }
           response_json = cc::utils::to_crow_json(j);
           return crow::response(200, response_json);
@@ -393,6 +417,110 @@ void Server::setupRoutes() {
                   res.unwrap_error().code),
               response_json);
         }
+      });
+
+  CROW_ROUTE(this->app, "/meals/by_range")
+      .methods(crow::HTTPMethod::GET)([this](const crow::request& req) {
+        auto fromp = req.url_params.get("from");
+        auto top = req.url_params.get("to");
+        crow::json::wvalue response_json;
+
+        if (!fromp || !top) {
+          response_json["error"] = "missing from/to";
+          return crow::response(400, response_json);
+        }
+
+        std::string fromStr(fromp);
+        std::string toStr(top);
+
+        auto validYmd = [](const std::string& s) {
+          return s.size() == 10 && s[4] == '-' && s[7] == '-';
+        };
+
+        if (!validYmd(fromStr) || !validYmd(toStr)) {
+          response_json["error"] = "wrong date format (use YYYY-MM-DD)";
+          return crow::response(400, response_json);
+        }
+
+        int fy = std::atoi(fromStr.substr(0, 4).c_str());
+        int fm = std::atoi(fromStr.substr(5, 2).c_str());
+        int fd = std::atoi(fromStr.substr(8, 2).c_str());
+
+        int ty = std::atoi(toStr.substr(0, 4).c_str());
+        int tm = std::atoi(toStr.substr(5, 2).c_str());
+        int td = std::atoi(toStr.substr(8, 2).c_str());
+
+        std::chrono::year_month_day fromYmd{
+            std::chrono::year{fy},
+            std::chrono::month{static_cast<unsigned>(fm)},
+            std::chrono::day{static_cast<unsigned>(fd)}};
+
+        std::chrono::year_month_day toYmd{
+            std::chrono::year{ty},
+            std::chrono::month{static_cast<unsigned>(tm)},
+            std::chrono::day{static_cast<unsigned>(td)}};
+
+        if (!fromYmd.ok() || !toYmd.ok()) {
+          response_json["error"] = "invalid date values";
+          return crow::response(400, response_json);
+        }
+
+        auto fromDay = std::chrono::sys_days{fromYmd};
+        auto toDay = std::chrono::sys_days{toYmd};
+
+        if (fromDay > toDay) {
+          response_json["error"] = "invalid range: from > to";
+          return crow::response(400, response_json);
+        }
+
+        constexpr int BIG_LIMIT = 100000;
+        auto res = this->mealService_->listMeals(0, BIG_LIMIT);
+
+        if (!res) {
+          response_json["error"] = res.unwrap_error().message;
+          return crow::response(
+              cc::utils::convert_error_code_into_HTTP_Responses(
+                  res.unwrap_error().code),
+              response_json);
+        }
+
+        nlohmann::json allMeals =
+            res.unwrap();  // array of MealLog JSON objects
+        nlohmann::json filtered = nlohmann::json::array();
+
+        for (auto& meal : allMeals) {
+          // your schema always has tsUtc, but keep it safe
+          if (!meal.contains("tsUtc")) continue;
+
+          auto tp = cc::utils::fromIso8601(meal["tsUtc"].get<std::string>());
+          auto day = std::chrono::floor<std::chrono::days>(tp);
+
+          if (day >= fromDay && day <= toDay) {
+            // enrich with calories + macros like your list endpoint
+            auto calRes = this->calculateCalories(meal);
+            if (!calRes) {
+              response_json["error"] = calRes.unwrap_error().message;
+              return crow::response(
+                  cc::utils::convert_error_code_into_HTTP_Responses(
+                      calRes.unwrap_error().code),
+                  response_json);
+            }
+
+            auto macRes = this->attachMacros_to_one_meal(meal);
+            if (!macRes) {
+              response_json["error"] = macRes.unwrap_error().message;
+              return crow::response(
+                  cc::utils::convert_error_code_into_HTTP_Responses(
+                      macRes.unwrap_error().code),
+                  response_json);
+            }
+
+            filtered.push_back(meal);
+          }
+        }
+
+        response_json = cc::utils::to_crow_json(filtered);
+        return crow::response(200, response_json);
       });
 
   // POST /meals
@@ -533,7 +661,7 @@ void Server::setupRoutes() {
         }
       });
 
-  // OPTIONAL: clear all meals
+  // clear all meals
   CROW_ROUTE(this->app, "/meals/clear")
       .methods(crow::HTTPMethod::DELETE)([this](const crow::request&) {
         auto res = this->mealService_->clear_data_base();
@@ -549,6 +677,75 @@ void Server::setupRoutes() {
                   res.unwrap_error().code),
               response_json);
         }
+      });
+
+  CROW_ROUTE(this->app, "/stats/day")
+      .methods(crow::HTTPMethod::GET)([this](const crow::request& req) {
+        auto d = req.url_params.get("day");
+        auto m = req.url_params.get("month");
+        auto y = req.url_params.get("year");
+        crow::json::wvalue out;
+
+        if (!d || !m || !y) {
+          out["error"] = "missing day/month/year";
+          return crow::response(400, out);
+        }
+
+        int day = std::atoi(d);
+        int month = std::atoi(m);
+        int year = std::atoi(y);
+
+        auto res = this->mealService_->getByDate(day, month, year);
+        if (!res) {
+          out["error"] = res.unwrap_error().message;
+          return crow::response(
+              cc::utils::convert_error_code_into_HTTP_Responses(
+                  res.unwrap_error().code),
+              out);
+        }
+
+        nlohmann::json meals = res.unwrap();
+
+        double totalCalories = 0.0;
+        double totalProtein = 0.0;
+        double totalCarbs = 0.0;
+        double totalFat = 0.0;
+
+        for (auto& meal : meals) {
+          auto calRes = this->calculateCalories(meal);
+          if (!calRes) {
+            out["error"] = calRes.unwrap_error().message;
+            return crow::response(
+                cc::utils::convert_error_code_into_HTTP_Responses(
+                    calRes.unwrap_error().code),
+                out);
+          }
+
+          auto macRes = this->attachMacros_to_one_meal(meal);
+          if (!macRes) {
+            out["error"] = macRes.unwrap_error().message;
+            return crow::response(
+                cc::utils::convert_error_code_into_HTTP_Responses(
+                    macRes.unwrap_error().code),
+                out);
+          }
+
+          totalCalories += meal.value("calories", 0.0);
+          totalProtein += meal.value("Protein", 0.0);
+          totalCarbs += meal.value("Carbs", 0.0);
+          totalFat += meal.value("Fat", 0.0);
+        }
+
+        out["day"] = day;
+        out["month"] = month;
+        out["year"] = year;
+        out["mealsCount"] = (int)meals.size();
+        out["totalCalories"] = (int)std::round(totalCalories);
+        out["Protein"] = (int)std::round(totalProtein);
+        out["Carbs"] = (int)std::round(totalCarbs);
+        out["Fat"] = (int)std::round(totalFat);
+
+        return crow::response(200, out);
       });
 
   ///////////////////////Meals//////////////////////////
@@ -568,7 +765,7 @@ void Server::start() {
     std::unique_lock<std::mutex> lk(m_);
     cv_.wait(lk, [this] { return running_; });
     // now wait until port is actually listening
-    cc::utils::waitUntilListening(this->port_,std::chrono::milliseconds{2000});
+    cc::utils::waitUntilListening(this->port_, std::chrono::milliseconds{2000});
   } catch (std::exception& e) {
     std::cerr << "Server thread exception" << e.what() << std::endl;
     std::terminate();
