@@ -20,14 +20,12 @@ cc::utils::Result<void> JsonFoodRepository::save(const cc::models::Food &food) {
     }
   }
   file_content.push_back(food);
-  std::cout << file_content.dump(4) << std::endl;
   std::ofstream o(filePath_);
   if (o.is_open()) {
     o << file_content.dump(4) << std::endl;
     o.close();
     return cc::utils::Result<void>::ok();
   } else {
-    std::cout << "can't open file" + filePath_ << std::endl;
     return cc::utils::Result<void>::fail(cc::utils::ErrorCode::StorageError,
                                          "can't open file");
   }

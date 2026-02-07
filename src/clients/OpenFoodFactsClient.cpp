@@ -43,14 +43,12 @@ cc::utils::Result<cc::models::Food> OpenFoodFactsClient::getByBarcode(const std:
         return cc::utils::Result<cc::models::Food>::fail(cc::utils::ErrorCode::NetworkError,
                                                          r.unwrap_error().message);
     } else {
-        std::cout << "GET succeeded, body size = " << r.unwrap().size() << "\n";
         auto parsed_food = this->parseFoodFromOffJson_barcode(r);
         if (!parsed_food) {
             std::cerr << "parsing failed" << std::endl;
             return cc::utils::Result<cc::models::Food>::fail(cc::utils::ErrorCode::ParseError,
                                                              parsed_food.unwrap_error().message);
         } else {
-            std::cout << "parsed succeeded" << std::endl;
             return parsed_food;
         }
     }
@@ -123,11 +121,6 @@ cc::utils::Result<cc::models::Food> OpenFoodFactsClient::parseFoodFromOffJson_ba
             }
         } // no need for else already null by default
 
-        // #todo remove this loop maybe
-        for (auto it = product.begin(); it != product.end(); ++it) {
-            std::cout << " - " << it.key() << std::endl;
-        }
-        // }
         if (product.contains("code") && !product["code"].is_null()) {
             food_item.setBarcode(product.at("code").get<std::string>());
             food_item.setId(product.at("code").get<std::string>());

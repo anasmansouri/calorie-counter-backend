@@ -70,7 +70,6 @@ cc::utils::Result<void> Server::attachMacros_to_one_meal(nlohmann::json& meal) {
       }
 
     } else {
-      std::cout << std::format("can't add macros") << std::endl;
       return cc::utils::Result<void>::fail(food_result.unwrap_error().code,
                                            food_result.unwrap_error().message);
     }
@@ -772,7 +771,6 @@ void Server::start() {
   }
 }
 void Server::stop() {
-  std::cout << "destructor" << std::endl;
   if (this->server_thread.joinable()) {
     this->app.stop();
     this->server_thread.join();
