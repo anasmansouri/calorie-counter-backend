@@ -1,5 +1,6 @@
 #pragma once
 #include <nlohmann/json.hpp>
+#include <format>
 #include <string>
 #include <magic_enum.hpp>
 namespace cc::models {

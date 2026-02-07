@@ -1,0 +1,13 @@
+services:
+  cc_app:
+    build: .
+    ports:
+      - "18080:18080"
+    environment:
+      CC_DB_PATH: /data/foods.json
+      CC_MEALS_DB_PATH: /data/meals.json
+    volumes:
+      - cc_data:/data
+
+volumes:
+  cc_data:
