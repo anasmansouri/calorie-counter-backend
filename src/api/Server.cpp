@@ -46,6 +46,7 @@ cc::utils::Result<void> Server::calculateCalories(nlohmann::json& meal) {
                                            food_result.unwrap_error().message);
     }
   }
+  //meal["calories"] = std::format("{:.2f}", totalKcal);
   meal["calories"] = totalKcal;
   return cc::utils::Result<void>::ok();
 }
@@ -611,10 +612,15 @@ void Server::setupRoutes() {
           meal.setTime(std::chrono::system_clock::now());
         }
 
+        // foodItems (optional)
         if (body.has("foodItems")) {
           std::vector<std::pair<std::string, double>> items;
-          for (auto item : body["foodItems"]) {
-            items.push_back({item[0].s(), item[1].d()});
+          for (const auto& it : body["foodItems"]) {
+            // Expect { "foodId": "...", "grams": 12.3 }
+            if (it.has("foodId") && it.has("grams")) {
+              items.emplace_back(std::string(it["foodId"].s()),
+                                 it["grams"].d());
+            }
           }
           meal.setFoodItems(items);
         }
