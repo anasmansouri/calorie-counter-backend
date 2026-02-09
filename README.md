@@ -137,7 +137,7 @@ Base URL: `http://127.0.0.1:18080`
 
 ### Foods
 - `GET /foods?offset=0&limit=50` → list foods
-- `GET /foods/by_barcode?barcode=...` → get a food (local or fetched )
+- `GET /foods/by_barcode?barcode=...` → get a food (local or fetched from openFoodFacts data base )
 - `POST /foods` → create food
 - `PUT /foods` → update food
 - `DELETE /foods?barcode=...` → delete one food by barcode
@@ -201,25 +201,34 @@ Health:
 curl http://127.0.0.1:18080/health
 ```
 
-Create a food:
+Search for a food (Oat):
 ```bash
-curl -X POST "http://127.0.0.1:18080/foods" \
-  -H "Content-Type: application/json" \
-  -d '{"id":"007","name":"Oats","brand":"Demo","barcode":"007","caloriePer100g":389.0,"nutrient":[]}'
+curl "http://127.0.0.1:18080/foods/by_barcode?barcode=5099801003339"
+ 
 ```
 
-Create a meal:
+Create a meal with 60g Oat(barcode=5099801003339) and 1 scrope of whey protein (barcode=5060469988474) and 2 eggs(barcode=4311501688120) and 100g of greek yogurt(barcode=5036589201687) 2 brötchen (barcode=4061458025058) and 1 table spoon of olive oil (barcode=9120014241020) :
 ```bash
 curl -X POST "http://127.0.0.1:18080/meals" \
   -H "Content-Type: application/json" \
-  -d '{"name":"Lunch","tsUtc":"2026-02-02T13:05:00Z","foodItems":[["007",50]]}'
+  -d '{
+     "name": "Breakfast",
+     "foodItems": [ 
+        {"foodId":"5099801003339", "grams":60.0}, 
+        {"foodId":"5060469988474", "grams":31},  
+        {"foodId":"4311501688120", "grams":100},  
+        {"foodId":"5036589201687", "grams":100},  
+        {"foodId":"4061458025058", "grams":140},  
+        {"foodId":"9120014241020", "grams":14}
+     ]
+   }'
 ```
 
-Daily stats:
+get a list of added meals including the totalCalories in each meal and Macros(Protein,Carbs,Fat) :
+
 ```bash
-curl "http://127.0.0.1:18080/stats/day?day=2&month=2&year=2026"
+curl "http://127.0.0.1:18080/meals"
 ```
-
 ---
 
 ## Tests
