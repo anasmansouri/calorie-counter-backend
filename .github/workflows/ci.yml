@@ -2,11 +2,18 @@ name: CI
 
 on:
   push:
+    branches: ["**"]
   pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build-test-format-coverage:
+  build-test-coverage:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
       - name: Checkout
@@ -15,17 +22,22 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y \
-            cmake make g++ \
-            clang-format \
-            gcovr
+          sudo apt-get install -y --no-install-recommends cmake make g++ gcovr git pkg-config  libcurl4-openssl-dev libasio-dev build-essential python3 ca-certificates
 
-      - name: Build (includes tests)
-        run: 
-          ./build_Ut.sh
+      - name: Make scripts executable
+        run: |
+          chmod +x ./build.sh ./build_and_run_ut.sh ./run.sh
+
+      - name: Build (Release)
+        run: |
+          ./build.sh
+
+      - name: Unit tests + coverage
+        run: |
+          ./build_and_run_ut.sh
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
         with:
           name: coverage-html
-          path: report/coverage.html
+          path: build/report
