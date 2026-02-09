@@ -1,6 +1,6 @@
 # Calorie Counter Backend (C++23)
 
-A small REST backend for logging foods and meals, built with **C++23** using **Crow** (HTTP server) and **JSON file storage**.
+A REST backend for logging foods and meals, built with **C++23** using **Crow** (HTTP server) and **JSON file storage**.
 
 ---
 
@@ -9,7 +9,7 @@ A small REST backend for logging foods and meals, built with **C++23** using **C
 - Foods: CRUD + search by barcode
 - Meals: CRUD + filter by name/date/range
 - Daily stats endpoint
-- Docker / docker-compose friendly (with persistent volume)
+- Docker / docker-compose 
 - Health endpoint for readiness checks
 
 ---
@@ -69,13 +69,13 @@ export CC_MEALS_DB_PATH=/tmp/cc_meals.json
 
 ### Stop the server
 
-If your app prints something like:
+The app  will print this:
 
 ```text
 click Enter to stop it
 ```
 
-then you stop it by pressing **Enter** in the same terminal.
+Stop it by pressing **Enter** in the same terminal.
 
 ---
 
@@ -86,33 +86,11 @@ then you stop it by pressing **Enter** in the same terminal.
 ```bash
 docker compose up --build
 ```
-
-### Run in background
-
-```bash
-docker compose up -d --build
-docker compose logs -f
-```
-
 ### Stop
 
 ```bash
 docker compose down
 ```
-
-### Important: keep the container running
-
-If your app waits for **Enter** to stop (interactive stdin), your container may exit immediately unless you enable a TTY.
-
-In `docker-compose.yml`, add:
-
-```yaml
-services:
-  cc_app:
-    stdin_open: true
-    tty: true
-```
-
 ### DB persistence (volume)
 
 Recommended compose setup (example):
@@ -147,21 +125,20 @@ Base URL: `http://127.0.0.1:18080`
 
 ### Foods
 - `GET /foods?offset=0&limit=50` → list foods
-- `GET /foods/by_barcode?barcode=...` → get a food (local or fetched depending on service)
+- `GET /foods/by_barcode?barcode=...` → get a food (local or fetched )
 - `POST /foods` → create food
 - `PUT /foods` → update food
 - `DELETE /foods?barcode=...` → delete one food by barcode
-- `DELETE /foods/clear` → delete all foods (dev/testing)
+- `DELETE /foods/clear` → delete all foods (from local data base)
 
 **Food JSON (POST/PUT):**
 ```json
 {
-  "id": "007",
+  "id": "4250519647774",
   "name": "Oats",
   "brand": "Demo",
   "barcode": "007",
   "caloriePer100g": 389.0,
-  "servingSizeG": 40.0,
   "nutrient": [
     {"type":"Protein","unit":"g","value":3.4},
     {"type":"Carbs","unit":"g","value":4.1},
@@ -175,11 +152,11 @@ Base URL: `http://127.0.0.1:18080`
 - `GET /meals/by_name?name=Lunch` → list meals matching name
 - `GET /meals/by_id?id=10` → get meal by id
 - `GET /meals/by_date?day=2&month=2&year=2026` → meals on a day
-- `GET /meals/by_range?from=YYYY-MM-DD&to=YYYY-MM-DD` → meals in date range (inclusive depending on implementation)
+- `GET /meals/by_range?from=YYYY-MM-DD&to=YYYY-MM-DD` → meals in date range
 - `POST /meals` → create meal
 - `PUT /meals` → update meal
 - `DELETE /meals?id=10` → delete meal by id
-- `DELETE /meals/clear` → delete all meals (dev/testing)
+- `DELETE /meals/clear` → delete all meals
 
 **Meal JSON (POST):**
 ```json
@@ -216,7 +193,7 @@ Create a food:
 ```bash
 curl -X POST "http://127.0.0.1:18080/foods" \
   -H "Content-Type: application/json" \
-  -d '{"id":"007","name":"Oats","brand":"Demo","barcode":"007","caloriePer100g":389.0,"servingSizeG":40.0,"nutrient":[]}'
+  -d '{"id":"007","name":"Oats","brand":"Demo","barcode":"007","caloriePer100g":389.0,"nutrient":[]}'
 ```
 
 Create a meal:
@@ -235,8 +212,14 @@ curl "http://127.0.0.1:18080/stats/day?day=2&month=2&year=2026"
 
 ## Tests
 
-### C++ unit tests (CTest)
-If your top-level CMake includes the `tests/` subdirectory when `BUILD_TESTS=ON`:
+### C++ unit tests (Google Test)
+to run Ut run only this script :
+
+```bash
+./build_and_run_ut.sh
+```
+
+or run the following commands :
 
 ```bash
 cmake -S . -B build-ut -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON
