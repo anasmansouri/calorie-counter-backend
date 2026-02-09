@@ -1,4 +1,3 @@
-# to use enum as string with implementing to string functions
 include(FetchContent)
 
 FetchContent_Declare(
@@ -24,7 +23,6 @@ target_include_directories(cc_utils
     SYSTEM PUBLIC  ${CMAKE_SOURCE_DIR}/third_party
 )
 
-#target_link_libraries(cc_utils PUBLIC magic_enum::magic_enum)
 # Models module
 add_library(cc_models
     models/food.hpp models/food.cpp
@@ -53,7 +51,6 @@ target_include_directories(cc_clients
 
 # libcurl library 
 find_package(CURL REQUIRED)
-#target_include_directories(cc_clients PRIVATE ${CURL_INCLUDE_DIRS})
 target_link_libraries(cc_clients PRIVATE ${CURL_LIBRARIES})
 
 target_include_directories(
@@ -101,9 +98,8 @@ add_library(cc_api
 )
 target_include_directories(cc_api PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(cc_api PUBLIC cc_services cc_utils)
+
 #######################
-
-
 
 # Crow 
 include(FetchContent)

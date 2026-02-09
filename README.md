@@ -41,6 +41,12 @@ cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j
 ```
 
+or simply run this script: 
+```bash
+./build.sh
+```
+
+
 Binary path:
 
 ```text
@@ -66,6 +72,12 @@ export CC_MEALS_DB_PATH=/tmp/cc_meals.json
 
 ./build/bin/cc_app
 ```
+or simply run this script (you can customize the data base path): 
+
+```bash
+./run.sh
+```
+
 
 ### Stop the server
 
@@ -229,7 +241,21 @@ ctest --test-dir build-ut --output-on-failure
 
 ### API integration tests (pytest)
 
+there already a requirements.txt file to make it easy to install dependencies: 
+
+#file content
+```yaml
+pytest==8.3.3
+requests==2.32.3
+psutil==5.9.8
+```
+
+to install those requirements run this command : 
+
 ```bash
-python3 -m pip install -U pytest requests
+python3 -m pip install -r ./tests/requirements.txt
+```
+to Start the integration test script run this : 
+```bash
 pytest -q tests/test_api
 ```

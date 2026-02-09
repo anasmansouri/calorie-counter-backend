@@ -16,7 +16,7 @@ endif()
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Compiler warnings (good for dev)
+# Compiler warnings 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     add_compile_options(-Wall -Wextra -Wpedantic -ftemplate-backtrace-limit=0 -fdiagnostics-color=always)
 endif()
@@ -46,7 +46,6 @@ if (BUILD_TESTS)
 endif()
 
 #############clang-format#############
-# ---- clang-format target ----
 find_program(CLANG_FORMAT_EXE NAMES clang-format)
 if(CLANG_FORMAT_EXE)
   file(GLOB_RECURSE ALL_CXX_SOURCE_FILES
@@ -64,27 +63,3 @@ if(CLANG_FORMAT_EXE)
     COMMENT "Running clang-format"
   )
 endif()
-
-
-# ---- clang-tidy (applies during build) ----
-#option(ENABLE_CLANG_TIDY "Enable clang-tidy analysis" ON)
-#if(ENABLE_CLANG_TIDY)
-#  find_program(CLANG_TIDY_EXE NAMES clang-tidy)
-#  if(CLANG_TIDY_EXE)
-#    set(CMAKE_CXX_CLANG_TIDY
-#      ${CLANG_TIDY_EXE};
-#      -p=${CMAKE_BINARY_DIR}
-#    )
-#  endif()
-#endif()
-# ---- clang-tidy (applies during build) ----
-#option(ENABLE_CLANG_TIDY "Enable clang-tidy analysis" OFF)
-#if(ENABLE_CLANG_TIDY)
-#  find_program(CLANG_TIDY_EXE NAMES clang-tidy)
-#  if(CLANG_TIDY_EXE)
-#    set(CMAKE_CXX_CLANG_TIDY
-#      ${CLANG_TIDY_EXE};
-#      -p=${CMAKE_BINARY_DIR}
-#    )
-#  endif()
-#endif()

@@ -12,7 +12,6 @@ FetchContent_MakeAvailable(googletest)
 
 find_package(Threads REQUIRED)
 
-#add_executable(cc_test_models test_models.cpp test_JsonMealRepository.cpp)
 add_executable(cc_test_models
     test_models/test_meal_model.cpp
     test_models/test_nutrient.cpp
@@ -35,7 +34,6 @@ target_link_libraries(cc_test_models PRIVATE
   cc_clients
   cc_storage
   cc_services
-  #cc_api
   GTest::gtest_main
   Threads::Threads
 )
