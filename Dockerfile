@@ -17,7 +17,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN mkdir -p build && cd build && cmake .. && make -j
+RUN ./build.sh ./run.sh 
 
 EXPOSE 18080
 ENV CC_DB_PATH=/data/foods.json
